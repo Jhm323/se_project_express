@@ -32,13 +32,13 @@ const getUser = (req, res) => {
     .orFail()
     .then((user) => res.status(200).send(user))
     .catch((err) => {
-      console.err(err);
-      if (err.name === "DocumentNotFoundError")
-        // {
-        // } else if (err.name ==="CastError") {
-
-        // }
-        return res.status(500).send({ message: err.message });
+      console.log(err);
+      if (err.name === "DocumentNotFoundError") {
+        return res.status(404).send({ message: err.message });
+      } else if (err.name === "CastError") {
+        return res.status(400).send({ message: err.message });
+      }
+      return res.status(500).send({ message: err.message });
     });
 };
 
