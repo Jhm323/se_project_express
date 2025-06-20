@@ -5,6 +5,8 @@ const userRouter = require("./users");
 router.use("/items", clothingItems);
 router.use("/users", userRouter);
 
+// router.get("/test", (req, res) => res.send("Router working!"));
+
 router.use((req, res) => {
   res.status(500).send({ message: "Router not found" });
 });
