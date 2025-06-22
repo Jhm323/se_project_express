@@ -7,9 +7,9 @@ const createItem = (req, res) => {
   const { name, weather, imageURL } = req.body;
 
   ClothingItem.create({
-    name: name,
-    weather: weather,
-    imageURL: imageURL,
+    name,
+    weather,
+    imageURL,
   })
     .then((item) => {
       console.log(item);
@@ -20,6 +20,40 @@ const createItem = (req, res) => {
     });
 };
 
+const getItems = (req, res) => {
+  ClothingItem.find({})
+    .then((items) => res.status(200).send(items))
+    .catch((e) => {
+      res.status(500).send({ message: "Error from getItems", e });
+    });
+};
+
+const updateItem = (req, res) => {
+  const { itemId } = res.params;
+  const { imageURL } = req.body;
+
+  ClothingItem.findByIdAndUpdate(itemId, { $set: { imageURL } })
+    .orFail()
+    .then((item) => res.status(200).send({ data: item }))
+    .catch((e) => {
+      res.status(500).send({ message: "Error from deleteItem", e });
+    });
+};
+
+const deleteItem = (req, res) => {
+  console.log(itemId);
+  ClothingItem.findByIdAndDelete(ItemId)
+    .orFail()
+    .then((item) => res.status(204).send({}));
+};
+
+// module.exports.createClothingItem = (req, res) => {
+//   console.log(req.user._id); // _id will become accessible
+// };
+
 module.exports = {
   createItem,
+  getItems,
+  updateItem,
+  deleteItem,
 };
