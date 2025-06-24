@@ -1,8 +1,15 @@
-// const SUCCESS = 200 = OK (success)
-// const BAD_REQUEST 400 = Bad Request (client sent invalid data)
-// const UNAUTHORIZED_ERROR = 401
-// const forbiddenError ... 403 = Forbidden (logged in but not allowed)
-// const documentNotFoundError... 404 = Not Found (resource doesn't exist)
-// 500 = Internal Server Error
+const SUCCESS = 200;
+const BAD_REQUEST_ERROR = 400;
+const UNAUTHORIZED_ERROR = 401;
+const FORBIDDEN_ERROR = 403;
+const DOCUMENTNOTFOUND_ERROR = 404;
+const INTERNAL_SERVER_ERROR = 500;
 
-// module.exports = { };
+module.exports = {
+  SUCCESS,
+  BAD_REQUEST_ERROR,
+  UNAUTHORIZED_ERROR,
+  FORBIDDEN_ERROR,
+  DOCUMENTNOTFOUND_ERROR,
+  INTERNAL_SERVER_ERROR,
+};
