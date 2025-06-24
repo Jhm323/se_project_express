@@ -47,9 +47,39 @@ const deleteItem = (req, res) => {
     .then((item) => res.status(204).send({}));
 };
 
-// module.exports.createClothingItem = (req, res) => {
-//   console.log(req.user._id); // _id will become accessible
-// };
+// module.exports.likeItem = (req, res) =>
+//   ClothingItem.findByIdAndUpdate(
+//     req.params.itemId,
+//     { $addToSet: { likes: req.user._id } }, // add _id to the array if it's not there yet
+//     { new: true }
+//   );
+// //...
+
+// module.exports.dislikeItem = (req, res) =>
+//   ClothingItem.findByIdAndUpdate(
+//     req.params.itemId,
+//     { $pull: { likes: req.user._id } }, // remove _id from the array
+//     { new: true }
+//   );
+// //...
+
+//  example error
+// const createUser = (req, res) => {
+//   User.create(...)    // arguments omitted
+//     .then(...)        // handle successful request
+//     .catch((err) => {
+//       console.error(err);
+//       if (err.name === 'SomeErrorName') {
+//         return res.status(SOME_ERROR_CODE).send({ message: "Appropriate error message" })
+//       } else {
+//         // if no errors match, return a response with status code 500
+//       }
+//     });
+// }
+
+module.exports.createClothingItem = (req, res) => {
+  console.log(req.user._id); // _id will become accessible
+};
 
 module.exports = {
   createItem,

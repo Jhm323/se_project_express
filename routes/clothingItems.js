@@ -21,6 +21,6 @@ router.put("/:itemId", updateItem);
 
 // delete
 
-router.delete("/LitemId", deleteItem);
+router.delete("/:itemId", deleteItem);
 
 module.exports = router;
