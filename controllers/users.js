@@ -4,7 +4,7 @@ const {
   BAD_REQUEST_ERROR,
   UNAUTHORIZED_ERROR,
   FORBIDDEN_ERROR,
-  DOCUMENTNOTFOUND_ERROR,
+  NOT_FOUND_ERROR,
   INTERNAL_SERVER_ERROR,
 } = require("../utils/errors");
 
@@ -17,9 +17,13 @@ const createUser = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError") {
-        return res.status(UNAUTHORIZED_ERROR).send({ message: err.message });
+        return res
+          .status(UNAUTHORIZED_ERROR)
+          .send({ message: "An error has occurred on the server" });
       } else {
-        return res.status(INTERNAL_SERVER_ERROR).send({ message: err.message });
+        return res
+          .status(INTERNAL_SERVER_ERROR)
+          .send({ message: "An error has occurred on the server" });
       }
     });
 };
@@ -30,7 +34,9 @@ const getUsers = (req, res) => {
     .then((users) => res.status(SUCCESS).send(users))
     .catch((err) => {
       console.error(err);
-      return res.status(INTERNAL_SERVER_ERROR).send({ message: err.message });
+      return res
+        .status(INTERNAL_SERVER_ERROR)
+        .send({ message: "An error has occurred on the server" });
     });
 };
 
@@ -42,13 +48,15 @@ const getUser = (req, res) => {
     .catch((err) => {
       console.log(err);
       if (err.name === "DocumentNotFoundError") {
-        return res
-          .status({ DOCUMENTNOTFOUND_ERROR })
-          .send({ message: err.message });
+        return res.status({ NOT_FOUND_ERROR }).send({ message: err.message });
       } else if (err.name === "CastError") {
-        return res.status(BAD_REQUEST_ERROR).send({ message: err.message });
+        return res
+          .status(BAD_REQUEST_ERROR)
+          .send({ message: "An error has occurred on the server" });
       }
-      return res.status(INTERNAL_SERVER_ERROR).send({ message: err.message });
+      return res
+        .status(INTERNAL_SERVER_ERROR)
+        .send({ message: "An error has occurred on the server" });
     });
 };
 

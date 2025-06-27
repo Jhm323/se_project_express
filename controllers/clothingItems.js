@@ -4,7 +4,7 @@ const {
   BAD_REQUEST_ERROR,
   UNAUTHORIZED_ERROR,
   FORBIDDEN_ERROR,
-  DOCUMENTNOTFOUND_ERROR,
+  NOT_FOUND_ERROR,
   INTERNAL_SERVER_ERROR,
 } = require("../utils/errors");
 
@@ -12,21 +12,25 @@ const {
 const createItem = (req, res) => {
   console.log(req.body);
 
-  const { name, weather, imageURL } = req.body;
+  const { name, weather, imageUrl } = req.body;
 
   ClothingItem.create({
     name,
     weather,
-    imageURL,
+    imageUrl,
+    owner,
   })
     .then((item) => {
       console.log(item);
       res.send({ data: item });
     })
     .catch((e) => {
+      if (err.name === "ValidationError") {
+        //// send the 400 error
+      }
       res
         .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "Error from createItem", e });
+        .send({ message: "Error from createItem" });
     });
 };
 
@@ -37,7 +41,7 @@ const getItems = (req, res) => {
     .catch((e) => {
       res
         .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "Error from getItems", e });
+        .send({ message: "Error from getItems" });
     });
 };
 
@@ -48,13 +52,13 @@ const deleteItem = (req, res) => {
     //
     .orFail(() => {
       const error = new Error("Card Not Found");
-      error.statusCode = DOCUMENTNOTFOUND_ERROR;
+      error.statusCode = NOT_FOUND_ERROR;
       throw error;
     })
     .then((item) => res.status(SUCCESS).send(item))
     .catch((err) => {
       if (err.name === "CastError") {
-        return res.status(BAD_REQUEST_ERROR).send({ message: "Invalid ID" });
+        return res.status(BAD_REQUEST_ERROR).send({ message: "Invalid data" });
       }
       if (err.statusCode) {
         return res
@@ -74,11 +78,15 @@ const likeItem = (req, res) => {
     { $addToSet: { likes: req.user._id } }, // add _id to the array if it's not there yet
     { new: true }
   )
+    .orFail()
     .then((items) => res.status(SUCCESS).send(items))
     .catch((e) => {
+      if (err.name === "CastError") {
+        // send the 400 error
+      }
       res
         .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "Error from getItems", e });
+        .send({ message: "Error from getItems" });
     });
 };
 
@@ -89,17 +97,21 @@ const dislikeItem = (req, res) => {
     { $pull: { likes: req.user._id } }, // remove _id from the array
     { new: true }
   )
+    .orFail()
     .then((items) => res.status(SUCCESS).send(items))
     .catch((e) => {
+      if (err.name === "CastError") {
+        // send the 400 error
+      }
       res
         .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "Error from getItems", e });
+        .send({ message: "Error from getItems" });
     });
 };
 
-module.exports.createClothingItem = (req, res) => {
-  console.log(req.user._id); // _id will become accessible
-};
+// module.exports.createClothingItem = (req, res) => {
+//   console.log(req.user._id); // _id will become accessible
+// };
 
 module.exports = {
   createItem,
