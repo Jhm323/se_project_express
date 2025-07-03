@@ -2,10 +2,8 @@ const User = require("../models/user");
 const {
   SUCCESS,
   BAD_REQUEST_ERROR,
-  UNAUTHORIZED_ERROR,
-  FORBIDDEN_ERROR,
-  NOT_FOUND_ERROR,
   INTERNAL_SERVER_ERROR,
+  NOT_FOUND_ERROR,
 } = require("../utils/errors");
 
 // POST /users
@@ -17,14 +15,11 @@ const createUser = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError") {
-        return res
-          .status(UNAUTHORIZED_ERROR)
-          .send({ message: "An error has occurred on the server" });
-      } else {
-        return res
-          .status(INTERNAL_SERVER_ERROR)
-          .send({ message: "An error has occurred on the server" });
+        return res.status(BAD_REQUEST_ERROR).send({ message: "Invalid data" });
       }
+      return res
+        .status(INTERNAL_SERVER_ERROR)
+        .send({ message: "An error has occurred on the server" });
     });
 };
 
@@ -48,11 +43,12 @@ const getUser = (req, res) => {
     .catch((err) => {
       console.log(err);
       if (err.name === "DocumentNotFoundError") {
-        return res.status({ NOT_FOUND_ERROR }).send({ message: err.message });
-      } else if (err.name === "CastError") {
+        return res.status(NOT_FOUND_ERROR).send({ message: err.message });
+      }
+      if (err.name === "CastError") {
         return res
           .status(BAD_REQUEST_ERROR)
-          .send({ message: "An error has occurred on the server" });
+          .send({ message: "The parameter is invalid" });
       }
       return res
         .status(INTERNAL_SERVER_ERROR)

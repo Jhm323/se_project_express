@@ -2,8 +2,6 @@ const ClothingItem = require("../models/clothingItem");
 const {
   SUCCESS,
   BAD_REQUEST_ERROR,
-  UNAUTHORIZED_ERROR,
-  FORBIDDEN_ERROR,
   NOT_FOUND_ERROR,
   INTERNAL_SERVER_ERROR,
 } = require("../utils/errors");
@@ -11,6 +9,8 @@ const {
 // POST ITEM
 const createItem = (req, res) => {
   console.log(req.body);
+
+  const owner = req.user._id;
 
   const { name, weather, imageUrl } = req.body;
 
@@ -24,11 +24,11 @@ const createItem = (req, res) => {
       console.log(item);
       res.send({ data: item });
     })
-    .catch((e) => {
+    .catch((err) => {
       if (err.name === "ValidationError") {
-        //// send the 400 error
+        return res.status(BAD_REQUEST_ERROR).send({ message: "Invalid data" });
       }
-      res
+      return res
         .status(INTERNAL_SERVER_ERROR)
         .send({ message: "Error from createItem" });
     });
@@ -38,7 +38,7 @@ const createItem = (req, res) => {
 const getItems = (req, res) => {
   ClothingItem.find({})
     .then((items) => res.status(SUCCESS).send(items))
-    .catch((e) => {
+    .catch(() => {
       res
         .status(INTERNAL_SERVER_ERROR)
         .send({ message: "Error from getItems" });
@@ -80,17 +80,17 @@ const likeItem = (req, res) => {
   )
     .orFail()
     .then((items) => res.status(SUCCESS).send(items))
-    .catch((e) => {
-      if (err.name === "CastError") {
-        // send the 400 error
+    .catch((err) => {
+      if (err.name === "DocumentNotFoundError") {
+        return res.status(NOT_FOUND_ERROR).send({ message: "Card Not Found" });
       }
-      res
-        .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "Error from getItems" });
+      return res
+        .status(BAD_REQUEST_ERROR)
+        .send({ message: "Invalid parameter" });
     });
 };
 
-// ...DELETE/PUT/ OR PATCH?
+// ...DELETE/PUT/OR PATCH?
 const dislikeItem = (req, res) => {
   ClothingItem.findByIdAndUpdate(
     req.params.id,
@@ -99,19 +99,21 @@ const dislikeItem = (req, res) => {
   )
     .orFail()
     .then((items) => res.status(SUCCESS).send(items))
-    .catch((e) => {
-      if (err.name === "CastError") {
-        // send the 400 error
+    .catch((err) => {
+      if (err.name === "DocumentNotFoundError") {
+        return res.status(NOT_FOUND_ERROR).send({ message: "Card Not Found" });
       }
-      res
+
+      if (err.name === "CastError") {
+        return res
+          .status(BAD_REQUEST_ERROR)
+          .send({ message: "Invalid parameter" });
+      }
+      return res
         .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "Error from getItems" });
+        .send({ message: "Error from disLikeItem" });
     });
 };
-
-// module.exports.createClothingItem = (req, res) => {
-//   console.log(req.user._id); // _id will become accessible
-// };
 
 module.exports = {
   createItem,
