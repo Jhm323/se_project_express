@@ -30,7 +30,7 @@ const createItem = (req, res) => {
       }
       return res
         .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "Error from createItem" });
+        .send({ message: "An error has occurred on the server" });
     });
 };
 
@@ -41,7 +41,7 @@ const getItems = (req, res) => {
     .catch(() => {
       res
         .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "Error from getItems" });
+        .send({ message: "An error has occurred on the server" });
     });
 };
 
@@ -81,12 +81,14 @@ const likeItem = (req, res) => {
     .orFail()
     .then((items) => res.status(SUCCESS).send(items))
     .catch((err) => {
-      if (err.name === "DocumentNotFoundError") {
-        return res.status(NOT_FOUND_ERROR).send({ message: "Card Not Found" });
+      if (err.name === "CastError") {
+        return res
+          .status(BAD_REQUEST_ERROR)
+          .send({ message: "Invalid parameter" });
       }
       return res
-        .status(BAD_REQUEST_ERROR)
-        .send({ message: "Invalid parameter" });
+        .status(INTERNAL_SERVER_ERROR)
+        .send({ message: "An error has occurred on the server" });
     });
 };
 
@@ -111,7 +113,7 @@ const dislikeItem = (req, res) => {
       }
       return res
         .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "Error from disLikeItem" });
+        .send({ message: "An error has occurred on the server" });
     });
 };
 
