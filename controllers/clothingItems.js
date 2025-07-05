@@ -63,7 +63,7 @@ const deleteItem = (req, res) => {
       if (err.statusCode) {
         return res
           .status(err.statusCode)
-          .send({ message: " Document Not Found" });
+          .send({ message: "Document Not Found" });
       }
       return res
         .status(INTERNAL_SERVER_ERROR)
@@ -81,6 +81,9 @@ const likeItem = (req, res) => {
     .orFail()
     .then((items) => res.status(SUCCESS).send(items))
     .catch((err) => {
+      if (err.name === "DocumentNotFoundError") {
+        return res.status(NOT_FOUND_ERROR).send({ message: "Not Found Error" });
+      }
       if (err.name === "CastError") {
         return res
           .status(BAD_REQUEST_ERROR)
@@ -91,6 +94,7 @@ const likeItem = (req, res) => {
         .send({ message: "An error has occurred on the server" });
     });
 };
+// Thank you for reviewing my project!
 
 // ...DELETE/PUT/OR PATCH?
 const dislikeItem = (req, res) => {
