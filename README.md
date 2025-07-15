@@ -1,180 +1,206 @@
-# WTWR Backend Server - Project 12
+# WTWR Backend Server - Project 13
 
-This repository contains the backend server for the "WTWR" (What to Wear?) application. It was built using **Express.js**, **MongoDB**, and **Mongoose**, and features basic API endpoints, temporary user authorization, and data validation for users and clothing items.
+This repository contains the backend server for the "WTWR" (What to Wear?) application. Built with **Express.js**, **MongoDB**, and **Mongoose**, it provides a RESTful API with user authentication, secure route access, and CRUD functionality for user profiles and clothing items.
 
----
+## Project Setup
 
-## 📦 Project Setup
+To get started:
 
-1. **Clone the repository**:
+```bash
+git clone https://github.com/your-username/se_project_express.git
+cd se_project_express
+npm init
+```
 
-   ```bash
-   git clone https://github.com/your-username/se_project_express.git
-   cd se_project_express
-   ```
+Install required dependencies:
 
-2. **Initialize the project**:
+```bash
+npm install express@^4.21.2 mongoose@^8.9.5 validator bcryptjs jsonwebtoken cors
+```
 
-   ```bash
-   npm init
-   ```
+Install development tools:
 
-3. **Install dependencies**:
+```bash
+npm install --save-dev nodemon eslint@8 eslint-config-airbnb-base@15 eslint-plugin-import@2 eslint-config-prettier@8 prettier@2
+```
 
-   ```bash
-   npm install express@^4.21.2 mongoose@^8.9.5 validator
-   ```
+## Project Objective
 
-4. **Dev dependencies**:
-   ```bash
-   npm install --save-dev nodemon eslint@8 eslint-config-airbnb-base@15 eslint-plugin-import@2 eslint-config-prettier@8 prettier@2
-   ```
+This backend server includes the following features:
 
----
+- User signup and login with JWT-based authentication
+- Password hashing and field protection
+- Secure routes using custom authorization middleware
+- Profile editing and resource ownership validation
+- RESTful routes for users and clothing items
+- Linting and formatting with ESLint and Prettier
+- GitHub Actions integration for continuous testing
 
-## 🧠 Project Objective
-
-Build an Express server with the following goals:
-
-- Set up RESTful API routes for Users and Clothing Items
-- Store and validate data using MongoDB and Mongoose
-- Implement error handling and basic authorization
-- Prepare for deployment and testing
-
----
-
-## 🧱 Project Structure
+## Project Structure
 
 ```
 .
 ├── app.js              # Entry point
 ├── controllers/        # Route logic
+├── middlewares/        # Authorization middleware
 ├── models/             # Mongoose schemas
 ├── routes/             # Express routers
-├── utils/              # Utility files (errors, etc.)
+├── utils/              # Utilities (config, errors, etc.)
 ├── .eslintrc.js        # Linter configuration
 ├── .editorconfig       # Editor settings
 └── .github/            # GitHub Actions workflows
 ```
 
----
+## Authentication & Authorization
 
-## 🧪 API Endpoints
+**Signup** (`POST /signup`)  
+Creates a new user account.
 
-### Users
+**Login** (`POST /signin`)  
+Returns a JWT if email and password are correct.
 
-- `GET /users` — Return all users
-- `GET /users/:userId` — Return user by ID
-- `POST /users` — Create a new user  
-  **Request Body**:
-  ```json
-  {
-    "name": "Your Name",
-    "avatar": "https://example.com/avatar.jpg"
-  }
-  ```
+All other routes are protected and require a valid JWT in the `Authorization` header, except:
 
-### Clothing Items
+- `POST /signup`
+- `POST /signin`
+- `GET /items`
 
-- `GET /items` — Return all items
-- `POST /items` — Create a new item  
-  **Request Body**:
-  ```json
-  {
-    "name": "Jacket",
-    "weather": "cold",
-    "imageUrl": "https://example.com/jacket.jpg"
-  }
-  ```
-- `DELETE /items/:itemId` — Delete an item
+Middleware in `middlewares/auth.js` checks token validity and attaches user info to the request.
+
+## User Endpoints
+
+- `GET /users/me` — Return the currently authenticated user
+- `PATCH /users/me` — Update the current user's `name` and `avatar`
+
+### Signup Request Body
+
+```json
+{
+  "email": "user@example.com",
+  "password": "securepassword",
+  "name": "Your Name",
+  "avatar": "https://example.com/avatar.jpg"
+}
+```
+
+### Login Request Body
+
+```json
+{
+  "email": "user@example.com",
+  "password": "securepassword"
+}
+```
+
+## Clothing Item Endpoints
+
+- `GET /items` — Return all clothing items (public)
+- `POST /items` — Add a new clothing item (authenticated)
+- `DELETE /items/:itemId` — Delete a clothing item (only if user is owner)
 - `PUT /items/:itemId/likes` — Like an item
 - `DELETE /items/:itemId/likes` — Unlike an item
 
----
+### POST /items Request Body
 
-## 🧑 Temporary Authorization Middleware
-
-Until full auth is implemented, use a hardcoded test user ID:
-
-```js
-app.use((req, res, next) => {
-  req.user = { _id: "5d8b8592978f8bd833ca8133" };
-  next();
-});
+```json
+{
+  "name": "Jacket",
+  "weather": "cold",
+  "imageUrl": "https://example.com/jacket.jpg"
+}
 ```
 
----
+Item ownership is enforced when deleting items. Users can only delete their own items.
 
-## ❌ Error Handling
+## Data Validation
 
-Use standardized error responses with appropriate HTTP status codes:
+- Email and password fields are required during signup.
+- Passwords are hashed using `bcryptjs` and stored securely.
+- `validator` is used to check valid emails and URLs.
+- The password field is hidden from query results using `select: false`.
 
-| Code | Description           |
-| ---- | --------------------- |
-| 400  | Invalid data or ID    |
-| 404  | Resource not found    |
-| 500  | Internal server error |
+To access the password for login authentication, use:
 
-Use `.orFail()` with Mongoose queries to catch missing documents.
+```js
+User.findOne({ email }).select("+password");
+```
 
----
+## Error Handling
 
-## 🧹 Linting & Formatting
+Standardized error codes and messages are used throughout the app:
 
-Run ESLint:
+| Code | Description                |
+| ---- | -------------------------- |
+| 400  | Bad Request / Invalid Data |
+| 401  | Unauthorized Access        |
+| 403  | Forbidden Action           |
+| 404  | Not Found                  |
+| 409  | Conflict / Duplicate       |
+| 500  | Internal Server Error      |
+
+Use `.orFail()` in Mongoose to catch missing resources and trigger appropriate error responses.
+
+## Linting & Formatting
+
+Use ESLint to check code style:
 
 ```bash
 npm run lint
 ```
 
-Auto-fix issues:
+To automatically fix linting issues:
 
 ```bash
 npm run lint -- --fix
 ```
 
-Prettier is configured to work alongside the Airbnb style guide.
+Prettier is configured with Airbnb base style rules.
 
----
+## Development with Nodemon
 
-## 🔁 Hot Reload Setup
-
-Run the dev server with nodemon:
+To run the development server with auto-reloading:
 
 ```bash
 npm run dev
 ```
 
----
+## CORS Setup
 
-## 🧪 Testing
+CORS is enabled to allow the frontend to communicate with this server:
 
-### ✅ Postman
+```js
+const cors = require("cors");
+app.use(cors());
+```
 
-- Fork the [Postman Test Suite](#)
-- Replace `validUserId` and `validCardId` with actual DB values if needed
-- Run the collection to verify endpoints
+## Testing
 
-### ✅ GitHub Actions
+### Postman
 
-- Push your code to GitHub
-- Check the **Actions** tab to ensure workflows pass
+- Use the official Postman collection for Sprint 13
+- Replace placeholder values (user IDs, tokens, item IDs) with real data from your database
+- You may run tests individually to avoid hitting Postman's collection run limits
 
----
+### GitHub Actions
 
-## ✅ Checklist
+- Push to GitHub to trigger tests
+- Review test results under the **Actions** tab
 
-Before submission:
+## Submission Checklist
 
-- [x] Project lints with no errors
-- [x] MongoDB connection is stable
-- [x] Routes return appropriate responses
-- [x] Error handling returns expected status codes
-- [x] Postman and GitHub Actions tests pass
+- [x] User authentication works using email and password
+- [x] JWT tokens are generated and verified correctly
+- [x] Users can only delete their own clothing items
+- [x] Protected routes are secured
+- [x] Passwords are hashed and never exposed in responses
+- [x] User profile updates (name and avatar) function correctly
+- [x] ESLint passes with no errors
+- [x] Postman tests pass
+- [x] GitHub Actions tests pass
 
----
+## Scripts
 
-## 🛠 Scripts
+In your `package.json`, these scripts should be defined:
 
 ```json
 "scripts": {
@@ -184,16 +210,9 @@ Before submission:
 }
 ```
 
----
+## Notes
 
-## 📌 Notes
-
-- This project uses hardcoded authorization for now — to be replaced in a future sprint
-- Be sure to validate `URL` fields using the `validator` package
-- Use enum values for weather: `"hot"`, `"warm"`, `"cold"`
-
----
-
-## 📇 License
-
-This project is for educational purposes through [TripleTen](https://tripleten.com).
+- Weather values should use one of the following enums: `"hot"`, `"warm"`, `"cold"`
+- Drop MongoDB collections in Compass if you need to enforce unique fields after development
+- Use the `delete` keyword to remove sensitive properties (e.g. passwords) from response objects
+- Project uses hardcoded authorization in earlier sprints — now fully replaced with token-based authentication
