@@ -1,21 +1,64 @@
+const bcrypt = require("bcryptjs"); // importing bcrypt
+// const validator = require("validator");
 const User = require("../models/user");
 const {
   SUCCESS,
   BAD_REQUEST_ERROR,
   INTERNAL_SERVER_ERROR,
   NOT_FOUND_ERROR,
+  CONFLICT_ERROR,
 } = require("../utils/errors");
+
+const login = (req, res) => {
+  const { email, password } = req.body;
+
+  User.findOne({ email })
+    .then((user) => {
+      if (!user) {
+        return Promise.reject(new Error("Incorrect email or password"));
+      }
+
+      return bcrypt.compare(password, user.password);
+    })
+    .then((matched) => {
+      if (!matched) {
+        // the hashes didn't match, rejecting the promise
+        return Promise.reject(new Error("Incorrect email or password"));
+      }
+
+      // authentication successful
+      res.send({ message: "Everything good!" });
+    })
+    .catch((err) => {
+      res.status(401).send({ message: err.message });
+    });
+};
 
 // POST /users
 const createUser = (req, res) => {
-  const { name, avatar } = req.body;
+  const { name, avatar, email, password } = req.body;
 
-  User.create({ name, avatar })
+  bcrypt
+    .hash(password, 10)
+    .then((hash) =>
+      User.create({
+        name,
+        avatar,
+        email,
+        password: hash,
+        // adding the hash to the database
+      })
+    )
     .then((user) => res.status(SUCCESS).send(user))
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError") {
         return res.status(BAD_REQUEST_ERROR).send({ message: "Invalid data" });
+      }
+      if (err.name === 11000) {
+        return res
+          .status(CONFLICT_ERROR)
+          .send({ message: "Email Already Exists" });
       }
       return res
         .status(INTERNAL_SERVER_ERROR)
@@ -56,4 +99,4 @@ const getUser = (req, res) => {
     });
 };
 
-module.exports = { getUsers, createUser, getUser };
+module.exports = { getUsers, createUser, getUser, login };
