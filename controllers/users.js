@@ -1,3 +1,5 @@
+const jwt = require("jsonwebtoken");
+const { JWT_SECRET } = require("../utils/config");
 const bcrypt = require("bcryptjs"); // importing bcrypt
 const User = require("../models/user");
 const {
@@ -36,16 +38,19 @@ const createUser = (req, res) => {
         avatar,
         email,
         password: hash,
-        // adding the hash to the database
+        // adding the hash
       })
     )
-    .then((user) => res.status(SUCCESS).send(user))
+    // .then((user) => res.status(SUCCESS).send(user))
+    .then(({ _id, name, avatar, email }) => {
+      res.status(SUCCESS).send({ _id, name, avatar, email });
+    })
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError") {
         return res.status(BAD_REQUEST_ERROR).send({ message: "Invalid data" });
       }
-      if (err.name === 11000) {
+      if (err.code === 11000) {
         return res
           .status(CONFLICT_ERROR)
           .send({ message: "Email Already Exists" });
@@ -69,7 +74,7 @@ const getUsers = (req, res) => {
 };
 
 const getCurrentUser = (req, res) => {
-  const { userId } = req.user._id;
+  const userId = req.user._id;
   User.findById(userId)
     .orFail()
     .then((user) => res.status(SUCCESS).send(user))
@@ -87,34 +92,35 @@ const getCurrentUser = (req, res) => {
         .status(INTERNAL_SERVER_ERROR)
         .send({ message: "An error has occurred on the server" });
     });
+};
 
-  const updateProfile = (req, res) => {
-    const { name, avatar } = req.body;
-    // Get new data from the request body
+// PATCH/users/me
+const updateProfile = (req, res) => {
+  const { name, avatar } = req.body;
+  // Get data
 
-    // Validate that at least one field is provided
-    if (!name && !avatar) {
-      return res
-        .status(400)
-        .send({ message: "Name or avatar must be provided." });
-    }
-    // Update the user in the database
-    User.findByIdAndUpdate(
-      req.user._id,
-      { name, avatar },
-      { new: true, runValidators: true }
-    )
-      .then((user) => {
-        if (!user) {
-          return res.status(404).send({ message: "User not found." });
-        }
-        res.send(user);
-        // Return the updated user object
-      })
-      .catch((err) => {
-        res.status(500).send({ message: "Server error." });
-      });
-  };
+  // Validate
+  if (!name && !avatar) {
+    return res
+      .status(400)
+      .send({ message: "Name or avatar must be provided." });
+  }
+  // Update the user
+  User.findByIdAndUpdate(
+    req.user._id,
+    { name, avatar },
+    { new: true, runValidators: true }
+  )
+    .then((user) => {
+      if (!user) {
+        return res.status(404).send({ message: "User not found." });
+      }
+      res.send(user);
+      // Return the updated user object
+    })
+    .catch((err) => {
+      res.status(500).send({ message: "Server error." });
+    });
 };
 
 module.exports = { getUsers, createUser, getCurrentUser, login, updateProfile };

@@ -1,20 +1,21 @@
+const jwt = require("jsonwebtoken");
+const { JWT_SECRET } = require("../utils/config");
 const { UNAUTHORIZED_ERROR_CODE } = require("../utils/errors");
 
 const auth = (req, res, next) => {
-  // const token = req.cookeies.jwt;
   const { authorization } = req.headers;
 
-  if (!authorization || !authorization.startsWith("Bearer")) {
-    res
+  if (!authorization || !authorization.startsWith("Bearer ")) {
+    return res
       .status(UNAUTHORIZED_ERROR_CODE)
       .send({ message: "Authorization Required" });
   }
 
-  const token = authorization.replace("Bearer", JWT_SECRET);
+  const token = authorization.replace("Bearer ", "");
   let payload;
 
   try {
-    payload = isJWT.verify(token, "JWT_SECRET");
+    payload = jwt.verify(token, JWT_SECRET);
   } catch (err) {
     console.error(err);
     return res
@@ -24,8 +25,7 @@ const auth = (req, res, next) => {
 
   req.user = payload;
   // assigning the payload to the request object
-
-  return next();
+  next();
   // sending the request to the next middleware
 };
 
