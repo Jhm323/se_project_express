@@ -87,6 +87,34 @@ const getCurrentUser = (req, res) => {
         .status(INTERNAL_SERVER_ERROR)
         .send({ message: "An error has occurred on the server" });
     });
+
+  const updateProfile = (req, res) => {
+    const { name, avatar } = req.body;
+    // Get new data from the request body
+
+    // Validate that at least one field is provided
+    if (!name && !avatar) {
+      return res
+        .status(400)
+        .send({ message: "Name or avatar must be provided." });
+    }
+    // Update the user in the database
+    User.findByIdAndUpdate(
+      req.user._id,
+      { name, avatar },
+      { new: true, runValidators: true }
+    )
+      .then((user) => {
+        if (!user) {
+          return res.status(404).send({ message: "User not found." });
+        }
+        res.send(user);
+        // Return the updated user object
+      })
+      .catch((err) => {
+        res.status(500).send({ message: "Server error." });
+      });
+  };
 };
 
-module.exports = { getUsers, createUser, getCurrentUser, login };
+module.exports = { getUsers, createUser, getCurrentUser, login, updateProfile };
