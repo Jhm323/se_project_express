@@ -9,7 +9,4 @@ router.use((req, res) => {
   res.status(NOT_FOUND_ERROR).send({ message: "Router not found" });
 });
 
-app.post("/signin", login);
-app.post("/signup", createUser);
-
 module.exports = router;

@@ -1,5 +1,4 @@
 const bcrypt = require("bcryptjs"); // importing bcrypt
-// const validator = require("validator");
 const User = require("../models/user");
 const {
   SUCCESS,
@@ -24,27 +23,6 @@ const login = (req, res) => {
       res.status(401).send({ message: "Invalid credentials" });
     });
 };
-
-//     if (!user) {
-//     return Promise.reject(new Error("Incorrect email or password"));
-//   }
-
-//   return bcrypt.compare(password, user.password);
-// })
-//   .then((matched) => {
-//     if (!matched) {
-//       // the hashes didn't match, rejecting the promise
-//       return Promise.reject(new Error("Incorrect email or password"));
-//     }
-
-//     // authentication successful
-//     res.send({ message: "Everything good!" });
-//   })
-//   .catch((err) => {
-//     res.status(401).send({ message: err.message });
-//   });
-
-// };
 
 // POST /users
 const createUser = (req, res) => {
@@ -90,8 +68,8 @@ const getUsers = (req, res) => {
     });
 };
 
-const getUser = (req, res) => {
-  const { userId } = req.params;
+const getCurrentUser = (req, res) => {
+  const { userId } = req.user._id;
   User.findById(userId)
     .orFail()
     .then((user) => res.status(SUCCESS).send(user))
@@ -111,4 +89,4 @@ const getUser = (req, res) => {
     });
 };
 
-module.exports = { getUsers, createUser, getUser, login };
+module.exports = { getUsers, createUser, getCurrentUser, login };

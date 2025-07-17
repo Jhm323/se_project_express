@@ -1,4 +1,4 @@
-const { UNAHTORIZED_ERROR_CODE } = require("../utils/errors");
+const { UNAUTHORIZED_ERROR_CODE } = require("../utils/errors");
 
 const auth = (req, res, next) => {
   // const token = req.cookeies.jwt;
@@ -10,11 +10,11 @@ const auth = (req, res, next) => {
       .send({ message: "Authorization Required" });
   }
 
-  const token = authorization.replace("Bearer", "");
+  const token = authorization.replace("Bearer", JWT_SECRET);
   let payload;
 
   try {
-    payload = isJWT.verify(token, "");
+    payload = isJWT.verify(token, "JWT_SECRET");
   } catch (err) {
     console.error(err);
     return res
