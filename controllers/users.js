@@ -5,7 +5,11 @@ const { JWT_SECRET } = require("../utils/config");
 const {
   SUCCESS,
   BAD_REQUEST_ERROR,
+  BAD_REQUEST_MSG,
+  UNAUTHORIZED_ERROR,
+  UNAUTHORIZED_MSG,
   NOT_FOUND_ERROR,
+  NOT_FOUND_MSG,
   handleDbError,
 } = require("../utils/errors");
 
@@ -22,7 +26,7 @@ const login = (req, res) => {
       res.send({ token });
     })
     .catch(() => {
-      res.status(401).send({ message: "Invalid credentials" });
+      res.status(UNAUTHORIZED_ERROR).send({ message: UNAUTHORIZED_MSG });
     });
 };
 
@@ -68,9 +72,7 @@ const updateProfile = (req, res) => {
   const { name, avatar } = req.body;
 
   if (!name && !avatar) {
-    return res
-      .status(BAD_REQUEST_ERROR)
-      .send({ message: "Name or avatar must be provided." });
+    return res.status(BAD_REQUEST_ERROR).send({ message: BAD_REQUEST_MSG });
   }
 
   User.findByIdAndUpdate(
@@ -80,7 +82,7 @@ const updateProfile = (req, res) => {
   )
     .then((user) => {
       if (!user) {
-        return res.status(NOT_FOUND_ERROR).send({ message: "User not found." });
+        return res.status(NOT_FOUND_ERROR).send({ message: NOT_FOUND_MSG });
       }
       res.send(user);
     })

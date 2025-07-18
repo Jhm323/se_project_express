@@ -1,8 +1,11 @@
 const ClothingItem = require("../models/clothingItem");
 const {
   SUCCESS,
-  NOT_FOUND_ERROR,
+  SUCCESS_MSG,
   FORBIDDEN_ERROR,
+  FORBIDDEN_MSG,
+  NOT_FOUND_ERROR,
+  NOT_FOUND_MSG,
   handleDbError,
 } = require("../utils/errors");
 
@@ -29,22 +32,18 @@ const deleteItem = (req, res) => {
   const currentUserId = req.user._id;
 
   ClothingItem.findById(itemId)
-    .orFail(() => {
-      const error = new Error("Item not found");
-      error.statusCode = NOT_FOUND_ERROR;
-      throw error;
-    })
     .then((item) => {
-      if (item.owner.toString() !== currentUserId.toString()) {
-        const error = new Error("Access denied");
-        error.statusCode = FORBIDDEN_ERROR;
-        throw error;
+      if (!item) {
+        return res.status(NOT_FOUND_ERROR).send({ message: NOT_FOUND_MSG });
       }
-      return item.deleteOne();
+      // Check if current user owns this item
+      if (item.owner.toString() !== currentUserId.toString()) {
+        return res.status(FORBIDDEN_ERROR).send({ message: FORBIDDEN_MSG });
+      }
+      // User owns the itme, proceed with deletion
+      return ClothingItem.findByIdAndDelete(itemId);
     })
-    .then(() =>
-      res.status(SUCCESS).send({ message: "Item deleted successfully" })
-    )
+    .then(() => res.status(SUCCESS).send({ message: SUCCESS_MSG }))
     .catch((err) => handleDbError(err, res));
 };
 
@@ -56,9 +55,7 @@ const likeItem = (req, res) => {
     { new: true }
   )
     .orFail(() => {
-      const error = new Error("Item not found");
-      error.statusCode = NOT_FOUND_ERROR;
-      throw error;
+      then(() => res.status(NOT_FOUND_ERROR).send({ message: NOT_FOUND_MSG }));
     })
     .then((item) => res.status(SUCCESS).send(item))
     .catch((err) => handleDbError(err, res));
@@ -72,9 +69,7 @@ const dislikeItem = (req, res) => {
     { new: true }
   )
     .orFail(() => {
-      const error = new Error("Item not found");
-      error.statusCode = NOT_FOUND_ERROR;
-      throw error;
+      then(() => res.status(NOT_FOUND_ERROR).send({ message: NOT_FOUND_MSG }));
     })
     .then((item) => res.status(SUCCESS).send(item))
     .catch((err) => handleDbError(err, res));

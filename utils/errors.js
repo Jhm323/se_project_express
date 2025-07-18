@@ -1,3 +1,4 @@
+// Error Codes
 const SUCCESS = 200;
 const BAD_REQUEST_ERROR = 400;
 const UNAUTHORIZED_ERROR = 401;
@@ -7,35 +8,53 @@ const CONFLICT_ERROR = 409;
 const INTERNAL_SERVER_ERROR = 500;
 const DUPLICATE_ERROR = 11000;
 
+// Status Code Messages
+const SUCCESS_MSG = "Request completed successfully.";
+const BAD_REQUEST_MSG = "Bad request. Please check your input.";
+const UNAUTHORIZED_MSG = "Unauthorized. Authentication required.";
+const FORBIDDEN_MSG =
+  "Forbidden. You do not have permission to perform this action.";
+const NOT_FOUND_MSG = "Resource not found.";
+const CONFLICT_MSG = "Conflict. The resource already exists.";
+const INTERNAL_SERVER_ERROR_MSG =
+  "Internal server error. Please try again later.";
+const DUPLICATE_ERROR_MSG = "Duplicate key error. This item already exists.";
+
 // Database error handler
 const handleDbError = (err, res) => {
   // console.log("Full error:", err);
   // console.log("Error name:", err.name);
   // console.log("Error message:", err.message);
   if (err.name === "ValidationError" || err.name === "CastError") {
-    return res
-      .status(BAD_REQUEST_ERROR)
-      .send({ message: "Invalid data format" });
+    return res.status(BAD_REQUEST_ERROR).send({ message: BAD_REQUEST_MSG });
   }
   if (err.statusCode === NOT_FOUND_ERROR) {
-    return res.status(NOT_FOUND_ERROR).send({ message: "Item not found" });
+    return res.status(NOT_FOUND_ERROR).send({ message: NOT_FOUND_MSG });
   }
   if (err.statusCode === FORBIDDEN_ERROR) {
-    return res.status(FORBIDDEN_ERROR).send({ message: "Access denied" });
+    return res.status(FORBIDDEN_ERROR).send({ message: FORBIDDEN_MSG });
   }
   return res
     .status(INTERNAL_SERVER_ERROR)
-    .send({ message: "Server error occurred" });
+    .send({ message: INTERNAL_SERVER_ERROR_MSG });
 };
 
 module.exports = {
   SUCCESS,
+  SUCCESS_MSG,
   BAD_REQUEST_ERROR,
+  BAD_REQUEST_MSG,
   UNAUTHORIZED_ERROR,
+  UNAUTHORIZED_MSG,
   FORBIDDEN_ERROR,
+  FORBIDDEN_MSG,
   NOT_FOUND_ERROR,
+  NOT_FOUND_MSG,
   CONFLICT_ERROR,
+  CONFLICT_MSG,
   INTERNAL_SERVER_ERROR,
+  INTERNAL_SERVER_ERROR_MSG,
   DUPLICATE_ERROR,
+  DUPLICATE_ERROR_MSG,
   handleDbError,
 };
