@@ -25,10 +25,10 @@ const getItems = (req, res) => {
 
 // DELETE ITEM
 const deleteItem = (req, res) => {
-  const { itemId } = req.params;
+  const { id } = req.params.id;
   const currentUserId = req.user._id;
 
-  ClothingItem.findById(itemId)
+  ClothingItem.findById({ id })
     .orFail(() => {
       const error = new Error("Item not found");
       error.statusCode = NOT_FOUND_ERROR;
