@@ -11,6 +11,7 @@ const {
   NOT_FOUND_ERROR,
   NOT_FOUND_MSG,
   handleDbError,
+  throwError,
 } = require("../utils/errors");
 
 // POST /signin
@@ -26,7 +27,7 @@ const login = (req, res) => {
       res.send({ token });
     })
     .catch(() => {
-      res.status(UNAUTHORIZED_ERROR).send({ message: UNAUTHORIZED_MSG });
+      throwError(UNAUTHORIZED_MSG, UNAUTHORIZED_ERROR);
     });
 };
 
@@ -62,7 +63,7 @@ const getCurrentUser = (req, res) => {
   const userId = req.user._id;
 
   User.findById(userId)
-    .orFail()
+    .orFail(() => throwError(NOT_FOUND_MSG, NOT_FOUND_ERROR))
     .then((user) => res.status(SUCCESS).send(user))
     .catch((err) => handleDbError(err, res));
 };
@@ -72,7 +73,7 @@ const updateProfile = (req, res) => {
   const { name, avatar } = req.body;
 
   if (!name && !avatar) {
-    return res.status(BAD_REQUEST_ERROR).send({ message: BAD_REQUEST_MSG });
+    return handleDbError(throwError(BAD_REQUEST_MSG, BAD_REQUEST_ERROR), res);
   }
 
   User.findByIdAndUpdate(
@@ -80,12 +81,8 @@ const updateProfile = (req, res) => {
     { name, avatar },
     { new: true, runValidators: true }
   )
-    .then((user) => {
-      if (!user) {
-        return res.status(NOT_FOUND_ERROR).send({ message: NOT_FOUND_MSG });
-      }
-      res.send(user);
-    })
+    .orFail(() => throwError(NOT_FOUND_MSG, NOT_FOUND_ERROR))
+    .then((user) => res.send(user))
     .catch((err) => handleDbError(err, res));
 };
 

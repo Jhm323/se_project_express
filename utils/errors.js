@@ -39,6 +39,12 @@ const handleDbError = (err, res) => {
     .send({ message: INTERNAL_SERVER_ERROR_MSG });
 };
 
+const throwError = (message, statusCode) => {
+  const err = new Error(message);
+  err.statusCode = statusCode;
+  throw err;
+};
+
 module.exports = {
   SUCCESS,
   SUCCESS_MSG,
@@ -57,4 +63,5 @@ module.exports = {
   DUPLICATE_ERROR,
   DUPLICATE_ERROR_MSG,
   handleDbError,
+  throwError,
 };

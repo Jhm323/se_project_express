@@ -7,6 +7,7 @@ const {
   NOT_FOUND_ERROR,
   NOT_FOUND_MSG,
   handleDbError,
+  throwError,
 } = require("../utils/errors");
 
 // CREATE ITEM
@@ -34,16 +35,21 @@ const deleteItem = (req, res) => {
   ClothingItem.findById(itemId)
     .then((item) => {
       if (!item) {
-        return res.status(NOT_FOUND_ERROR).send({ message: NOT_FOUND_MSG });
+        throwError(NOT_FOUND_MSG, NOT_FOUND_ERROR);
       }
-      // Check if current user owns this item
-      if (item.owner.toString() !== currentUserId.toString()) {
-        return res.status(FORBIDDEN_ERROR).send({ message: FORBIDDEN_MSG });
+
+      const itemOwnerId = item.owner.toString();
+      if (itemOwnerId !== currentUserId.toString()) {
+        throwError(FORBIDDEN_MSG, FORBIDDEN_ERROR);
       }
-      // User owns the itme, proceed with deletion
+
       return ClothingItem.findByIdAndDelete(itemId);
     })
-    .then(() => res.status(SUCCESS).send({ message: SUCCESS_MSG }))
+    .then((deletedItem) => {
+      if (deletedItem) {
+        return res.status(SUCCESS).send({ message: SUCCESS_MSG });
+      }
+    })
     .catch((err) => handleDbError(err, res));
 };
 
@@ -51,13 +57,11 @@ const deleteItem = (req, res) => {
 const likeItem = (req, res) => {
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
-    { $addToSet: { likes: req.user._id } },
+    { $addToSet: { likes: req.user._id } }, // prevents duplicate likes
     { new: true }
   )
-    .orFail(() => {
-      then(() => res.status(NOT_FOUND_ERROR).send({ message: NOT_FOUND_MSG }));
-    })
-    .then((item) => res.status(SUCCESS).send(item))
+    .orFail(() => throwError(NOT_FOUND_MSG, NOT_FOUND_ERROR))
+    .then((item) => res.status(SUCCESS).send({ data: item }))
     .catch((err) => handleDbError(err, res));
 };
 
@@ -68,10 +72,8 @@ const dislikeItem = (req, res) => {
     { $pull: { likes: req.user._id } },
     { new: true }
   )
-    .orFail(() => {
-      then(() => res.status(NOT_FOUND_ERROR).send({ message: NOT_FOUND_MSG }));
-    })
-    .then((item) => res.status(SUCCESS).send(item))
+    .orFail(() => throwError(NOT_FOUND_MSG, NOT_FOUND_ERROR))
+    .then((item) => res.status(SUCCESS).send({ data: item }))
     .catch((err) => handleDbError(err, res));
 };
 
