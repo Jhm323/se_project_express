@@ -16,12 +16,12 @@ router.get("/", getItems);
 router.post("/", createItem);
 
 // Like a clothing item
-router.put("/:id/likes", likeItem);
+router.put("/:itemId/likes", likeItem);
 
 // Remove a like (dislike) from a clothing item
-router.delete("/:id/likes", dislikeItem);
+router.delete("/:itemId/likes", dislikeItem);
 
 // Delete a clothing item
-router.delete("/:id", deleteItem);
+router.delete("/:itemId", deleteItem);
 
 module.exports = router;

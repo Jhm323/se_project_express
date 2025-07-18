@@ -15,7 +15,7 @@ router.use("/items", clothingItemsRouter);
 router.use("/users", userRouter);
 
 // Fallback route for undefined endpoints
-router.use("*", (req, res) => {
+router.use((req, res) => {
   res.status(NOT_FOUND_ERROR).send({ message: "Route not found" });
 });
 

@@ -28,20 +28,20 @@ const login = (req, res) => {
 
 // POST /users
 const createUser = (req, res) => {
-  const { name, avatar, email, password } = req.body;
+  const { email, password, name, avatar } = req.body;
 
   bcrypt
     .hash(password, 10)
     .then((hash) =>
       User.create({
-        name,
-        avatar,
         email,
         password: hash, // store the hashed password
+        name,
+        avatar,
       })
     )
-    .then(({ _id, name, avatar, email }) => {
-      res.status(SUCCESS).send({ _id, name, avatar, email }); // omit password from response
+    .then(({ email, password, name, avatar }) => {
+      res.status(SUCCESS).send({ email, password, name, avatar }); // omit password from response
     })
     .catch((err) => handleDbError(err, res));
 };
