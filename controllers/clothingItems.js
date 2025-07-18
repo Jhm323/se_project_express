@@ -1,124 +1,83 @@
 const ClothingItem = require("../models/clothingItem");
 const {
   SUCCESS,
-  BAD_REQUEST_ERROR,
   NOT_FOUND_ERROR,
-  INTERNAL_SERVER_ERROR,
+  FORBIDDEN_ERROR,
+  handleDbError,
 } = require("../utils/errors");
 
-// POST ITEM
+// CREATE ITEM
 const createItem = (req, res) => {
-  console.log(req.body);
-
   const owner = req.user._id;
-
   const { name, weather, imageUrl } = req.body;
 
-  ClothingItem.create({
-    name,
-    weather,
-    imageUrl,
-    owner,
-  })
-    .then((item) => {
-      console.log(item);
-      res.send({ data: item });
-    })
-    .catch((err) => {
-      if (err.name === "ValidationError") {
-        return res.status(BAD_REQUEST_ERROR).send({ message: "Invalid data" });
-      }
-      return res
-        .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "An error has occurred on the server" });
-    });
+  ClothingItem.create({ name, weather, imageUrl, owner })
+    .then((item) => res.status(SUCCESS).send({ data: item }))
+    .catch((err) => handleDbError(err, res));
 };
 
-// GET ITEM
+// GET ALL ITEMS
 const getItems = (req, res) => {
   ClothingItem.find({})
     .then((items) => res.status(SUCCESS).send(items))
-    .catch(() => {
-      res
-        .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "An error has occurred on the server" });
-    });
+    .catch((err) => handleDbError(err, res));
 };
 
 // DELETE ITEM
 const deleteItem = (req, res) => {
-  console.log(req.params.id);
-  ClothingItem.findByIdAndDelete(req.params.id)
-    //
+  const { itemId } = req.params;
+  const currentUserId = req.user._id;
+
+  ClothingItem.findById(itemId)
     .orFail(() => {
-      const error = new Error("Card Not Found");
+      const error = new Error("Item not found");
+      error.statusCode = NOT_FOUND_ERROR;
+      throw error;
+    })
+    .then((item) => {
+      if (item.owner.toString() !== currentUserId.toString()) {
+        const error = new Error("Access denied");
+        error.statusCode = FORBIDDEN_ERROR;
+        throw error;
+      }
+      return item.deleteOne();
+    })
+    .then(() =>
+      res.status(SUCCESS).send({ message: "Item deleted successfully" })
+    )
+    .catch((err) => handleDbError(err, res));
+};
+
+// LIKE ITEM
+const likeItem = (req, res) => {
+  ClothingItem.findByIdAndUpdate(
+    req.params.id,
+    { $addToSet: { likes: req.user._id } },
+    { new: true }
+  )
+    .orFail(() => {
+      const error = new Error("Item not found");
       error.statusCode = NOT_FOUND_ERROR;
       throw error;
     })
     .then((item) => res.status(SUCCESS).send(item))
-    .catch((err) => {
-      if (err.name === "CastError") {
-        return res.status(BAD_REQUEST_ERROR).send({ message: "Invalid data" });
-      }
-      if (err.statusCode) {
-        return res
-          .status(err.statusCode)
-          .send({ message: "Document Not Found" });
-      }
-      return res
-        .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "An error has occurred on the server" });
-    });
+    .catch((err) => handleDbError(err, res));
 };
 
-// PATCH ITEM
-const likeItem = (req, res) => {
-  ClothingItem.findByIdAndUpdate(
-    req.params.id,
-    { $addToSet: { likes: req.user._id } }, // add _id to the array if it's not there yet
-    { new: true }
-  )
-    .orFail()
-    .then((items) => res.status(SUCCESS).send(items))
-    .catch((err) => {
-      if (err.name === "DocumentNotFoundError") {
-        return res.status(NOT_FOUND_ERROR).send({ message: "Not Found Error" });
-      }
-      if (err.name === "CastError") {
-        return res
-          .status(BAD_REQUEST_ERROR)
-          .send({ message: "Invalid parameter" });
-      }
-      return res
-        .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "An error has occurred on the server" });
-    });
-};
-// Thank you for reviewing my project!
-
-// ...DELETE/PUT/OR PATCH?
+// DISLIKE ITEM
 const dislikeItem = (req, res) => {
   ClothingItem.findByIdAndUpdate(
     req.params.id,
-    { $pull: { likes: req.user._id } }, // remove _id from the array
+    { $pull: { likes: req.user._id } },
     { new: true }
   )
-    .orFail()
-    .then((items) => res.status(SUCCESS).send(items))
-    .catch((err) => {
-      if (err.name === "DocumentNotFoundError") {
-        return res.status(NOT_FOUND_ERROR).send({ message: "Card Not Found" });
-      }
-
-      if (err.name === "CastError") {
-        return res
-          .status(BAD_REQUEST_ERROR)
-          .send({ message: "Invalid parameter" });
-      }
-      return res
-        .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "An error has occurred on the server" });
-    });
+    .orFail(() => {
+      const error = new Error("Item not found");
+      error.statusCode = NOT_FOUND_ERROR;
+      throw error;
+    })
+    .then((item) => res.status(SUCCESS).send(item))
+    .catch((err) => handleDbError(err, res));
 };
 
 module.exports = {
