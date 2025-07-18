@@ -4,64 +4,53 @@ const validator = require("validator");
 
 const { Schema } = mongoose;
 
-const userSchema = new mongoose.Schema({
+const userSchema = new Schema({
   name: {
     type: String,
-    required: true,
-    minlength: 2,
-    maxlength: 30,
+    required: [true, "Name is required."],
+    minlength: [2, "Name must be at least 2 characters."],
+    maxlength: [30, "Name cannot exceed 30 characters."],
+    trim: true,
   },
   avatar: {
     type: String,
-    required: [true, "The avatar field is required."],
+    required: [true, "Avatar URL is required."],
     validate: {
-      validator(value) {
-        return validator.isURL(value);
-      },
-      message: "You must enter a valid URL",
+      validator: validator.isURL,
+      message: "You must enter a valid URL.",
     },
   },
   email: {
     type: String,
-    required: true,
+    required: [true, "Email is required."],
     unique: true,
+    lowercase: true,
     validate: {
-      validator(value) {
-        return validator.isEmail(value);
-      },
-      message: "You must enter a valid email",
+      validator: validator.isEmail,
+      message: "You must enter a valid email address.",
     },
   },
   password: {
     type: String,
-    required: true,
+    required: [true, "Password is required."],
+    minlength: [8, "Password must be at least 8 characters."],
     select: false,
-    minlength: 8,
   },
 });
 
-userSchema.statics.findUserByCredentials = function findUserByCredentials(
-  email,
-  password
-) {
-  // trying to find the user by email
-  return this.findOne({ email })
-    .select("+password") // this — the User model
-    .then((user) => {
-      // not found - rejecting the promise
-      if (!user) {
-        return Promise.reject(new Error("Incorrect email or password"));
-      }
+// Static method to authenticate user
+userSchema.statics.findUserByCredentials = async function (email, password) {
+  const user = await this.findOne({ email }).select("+password");
+  if (!user) {
+    throw new Error("Incorrect email or password");
+  }
 
-      // found - comparing hashes
-      return bcrypt.compare(password, user.password).then((matched) => {
-        if (!matched) {
-          return Promise.reject(new Error("Incorrect email or password"));
-        }
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) {
+    throw new Error("Incorrect email or password");
+  }
 
-        return user; // now user is available
-      });
-    });
+  return user;
 };
 
-module.exports = mongoose.model("user", userSchema);
+module.exports = mongoose.model("User", userSchema);
