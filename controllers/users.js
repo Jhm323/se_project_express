@@ -45,8 +45,8 @@ const createUser = (req, res) => {
         avatar,
       })
     )
-    .then(({ email, password, name, avatar }) => {
-      res.status(SUCCESS).send({ email, password, name, avatar }); // omit password from response
+    .then(({ email, name, avatar }) => {
+      res.status(SUCCESS).send({ email, name, avatar }); // omit password from response
     })
     .catch((err) => handleDbError(err, res));
 };

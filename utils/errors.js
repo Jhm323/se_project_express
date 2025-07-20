@@ -22,9 +22,6 @@ const DUPLICATE_ERROR_MSG = "Duplicate key error. This item already exists.";
 
 // Database error handler
 const handleDbError = (err, res) => {
-  // console.log("Full error:", err);
-  // console.log("Error name:", err.name);
-  // console.log("Error message:", err.message);
   if (err.name === "ValidationError" || err.name === "CastError") {
     return res.status(BAD_REQUEST_ERROR).send({ message: BAD_REQUEST_MSG });
   }
