@@ -41,12 +41,12 @@ app.use((req, res) => {
 });
 
 // Global error handler — catches errors from routes & middleware
-app.use((err, req, res) => {
-  // Default to 500 if no statusCode set on error
+
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
   const message = statusCode === 500 ? "Internal Server Error" : err.message;
 
-  // Log the full error stack in dev environments
   if (process.env.NODE_ENV !== "production") {
     console.error(err.stack);
   }
