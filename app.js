@@ -41,7 +41,7 @@ app.use((req, res) => {
 });
 
 // Global error handler — catches errors from routes & middleware
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
   // Default to 500 if no statusCode set on error
   const statusCode = err.statusCode || 500;
   const message = statusCode === 500 ? "Internal Server Error" : err.message;
