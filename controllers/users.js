@@ -32,24 +32,30 @@ const login = (req, res) => {
 };
 
 // POST /users
-const createUser = (req, res) => {
+/* eslint-disable consistent-return */
+const createUser = async (req, res) => {
   const { email, password, name, avatar } = req.body;
 
-  bcrypt
-    .hash(password, 10)
-    .then((hash) =>
-      User.create({
-        email,
-        password: hash, // store the hashed password
-        name,
-        avatar,
-      })
-    )
-    .then(({ email, name, avatar }) => {
-      res.status(SUCCESS).send({ email, name, avatar }); // omit password from response
-    })
-    .catch((err) => handleDbError(err, res));
+  try {
+    const hash = await bcrypt.hash(password, 10);
+
+    const user = await User.create({
+      email,
+      password: hash,
+      name,
+      avatar,
+    });
+
+    return res.status(SUCCESS).send({
+      email: user.email,
+      name: user.name,
+      avatar: user.avatar,
+    });
+  } catch (err) {
+    return handleDbError(err, res);
+  }
 };
+/* eslint-enable consistent-return */
 
 // GET /users
 const getUsers = (req, res) => {

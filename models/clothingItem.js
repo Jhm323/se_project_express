@@ -45,18 +45,19 @@ const clothingItemSchema = new Schema({
 });
 
 // Instance & Static Methods
-//  Instance: Check if user liked this item
-clothingItemSchema.methods.isLikedByUser = function (userId) {
+
+// Instance: Check if user liked this item
+clothingItemSchema.methods.isLikedByUser = function isLikedByUser(userId) {
   return this.likes.includes(userId);
 };
 
 // Static: Get items by weather type
-clothingItemSchema.statics.findByWeather = function (weather) {
+clothingItemSchema.statics.findByWeather = function findByWeather(weather) {
   return this.find({ weather });
 };
 
-//Static: Get items liked by a specific user
-clothingItemSchema.statics.findLikedByUser = function (userId) {
+// Static: Get items liked by a specific user
+clothingItemSchema.statics.findLikedByUser = function findLikedByUser(userId) {
   return this.find({ likes: userId });
 };
 

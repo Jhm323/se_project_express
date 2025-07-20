@@ -28,29 +28,32 @@ const getItems = (req, res) => {
 };
 
 // DELETE ITEM
-const deleteItem = (req, res) => {
+const deleteItem = async (req, res) => {
   const { itemId } = req.params;
   const currentUserId = req.user._id;
 
-  ClothingItem.findById(itemId)
-    .then((item) => {
-      if (!item) {
-        throwError(NOT_FOUND_MSG, NOT_FOUND_ERROR);
-      }
+  try {
+    const item = await ClothingItem.findById(itemId);
 
-      const itemOwnerId = item.owner.toString();
-      if (itemOwnerId !== currentUserId.toString()) {
-        throwError(FORBIDDEN_MSG, FORBIDDEN_ERROR);
-      }
+    if (!item) {
+      const error = new Error(NOT_FOUND_MSG);
+      error.statusCode = NOT_FOUND_ERROR;
+      throw error;
+    }
 
-      return ClothingItem.findByIdAndDelete(itemId);
-    })
-    .then((deletedItem) => {
-      if (deletedItem) {
-        return res.status(SUCCESS).send({ message: SUCCESS_MSG });
-      }
-    })
-    .catch((err) => handleDbError(err, res));
+    const itemOwnerId = item.owner.toString();
+
+    if (itemOwnerId !== currentUserId.toString()) {
+      const error = new Error(FORBIDDEN_MSG);
+      error.statusCode = FORBIDDEN_ERROR;
+      throw error;
+    }
+
+    await ClothingItem.findByIdAndDelete(itemId);
+    return res.status(SUCCESS).send({ message: SUCCESS_MSG });
+  } catch (err) {
+    return handleDbError(err, res);
+  }
 };
 
 // LIKE ITEM
