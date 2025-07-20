@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const validator = require("validator");
 const User = require("../models/user");
 const { JWT_SECRET } = require("../utils/config");
 const {
@@ -20,21 +21,23 @@ const login = (req, res) => {
 
   if (!email || !password) {
     return res
-      .status(BAD_REQUEST)
+      .status(BAD_REQUEST_ERROR)
       .send({ message: "Email and password are required." });
   }
 
   if (!validator.isEmail(email)) {
-    return res.status(BAD_REQUEST).send({ message: "Invalid email format." });
+    return res
+      .status(BAD_REQUEST_ERROR)
+      .send({ message: "Invalid email format." });
   }
 
-  User.findUserByCredentials(email, password)
+  return User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
         expiresIn: "7d",
       });
 
-      res.send({ token });
+      return res.send({ token });
     })
     .catch(() =>
       res.status(UNAUTHORIZED_ERROR).send({ message: UNAUTHORIZED_MSG })
@@ -42,30 +45,28 @@ const login = (req, res) => {
 };
 
 // POST /users
-/* eslint-disable consistent-return */
-const createUser = async (req, res) => {
+const createUser = (req, res) => {
   const { email, password, name, avatar } = req.body;
 
-  try {
-    const hash = await bcrypt.hash(password, 10);
-
-    const user = await User.create({
-      email,
-      password: hash,
-      name,
-      avatar,
-    });
-
-    return res.status(SUCCESS).send({
-      email: user.email,
-      name: user.name,
-      avatar: user.avatar,
-    });
-  } catch (err) {
-    return handleDbError(err, res);
-  }
+  return bcrypt
+    .hash(password, 10)
+    .then((hash) =>
+      User.create({
+        email,
+        password: hash,
+        name,
+        avatar,
+      })
+    )
+    .then((user) =>
+      res.status(SUCCESS).send({
+        email: user.email,
+        name: user.name,
+        avatar: user.avatar,
+      })
+    )
+    .catch((err) => handleDbError(err, res));
 };
-/* eslint-enable consistent-return */
 
 // GET /users
 const getUsers = (req, res) => {
@@ -92,7 +93,7 @@ const updateProfile = (req, res) => {
     return handleDbError(throwError(BAD_REQUEST_MSG, BAD_REQUEST_ERROR), res);
   }
 
-  User.findByIdAndUpdate(
+  return User.findByIdAndUpdate(
     req.user._id,
     { name, avatar },
     { new: true, runValidators: true }
