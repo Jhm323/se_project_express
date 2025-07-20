@@ -20,15 +20,17 @@ const login = (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return res
-      .status(BAD_REQUEST_ERROR)
-      .send({ message: "Email and password are required." });
+    return handleDbError(
+      throwError("Email and password are required.", BAD_REQUEST_ERROR),
+      res
+    );
   }
 
   if (!validator.isEmail(email)) {
-    return res
-      .status(BAD_REQUEST_ERROR)
-      .send({ message: "Invalid email format." });
+    return handleDbError(
+      throwError("Invalid email format.", BAD_REQUEST_ERROR),
+      res
+    );
   }
 
   return User.findUserByCredentials(email, password)
@@ -36,17 +38,30 @@ const login = (req, res) => {
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
         expiresIn: "7d",
       });
-
       return res.send({ token });
     })
     .catch(() =>
-      res.status(UNAUTHORIZED_ERROR).send({ message: UNAUTHORIZED_MSG })
+      handleDbError(throwError(UNAUTHORIZED_MSG, UNAUTHORIZED_ERROR), res)
     );
 };
 
 // POST /users
 const createUser = (req, res) => {
   const { email, password, name, avatar } = req.body;
+
+  if (!email || !password) {
+    return handleDbError(
+      throwError("Email and password are required.", BAD_REQUEST_ERROR),
+      res
+    );
+  }
+
+  if (!validator.isEmail(email)) {
+    return handleDbError(
+      throwError("Invalid email format.", BAD_REQUEST_ERROR),
+      res
+    );
+  }
 
   return bcrypt
     .hash(password, 10)
@@ -69,17 +84,16 @@ const createUser = (req, res) => {
 };
 
 // GET /users
-const getUsers = (req, res) => {
+const getUsers = (req, res) =>
   User.find({})
     .then((users) => res.status(SUCCESS).send(users))
     .catch((err) => handleDbError(err, res));
-};
 
 // GET /users/me
 const getCurrentUser = (req, res) => {
   const userId = req.user._id;
 
-  User.findById(userId)
+  return User.findById(userId)
     .orFail(() => throwError(NOT_FOUND_MSG, NOT_FOUND_ERROR))
     .then((user) => res.status(SUCCESS).send(user))
     .catch((err) => handleDbError(err, res));
