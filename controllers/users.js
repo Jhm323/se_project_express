@@ -80,7 +80,13 @@ const createUser = (req, res) => {
         avatar: user.avatar,
       })
     )
-    .catch((err) => handleDbError(err, res));
+
+    .catch((err) => {
+      if (err.code === 11000) {
+        return handleDbError(throwError("Email already exists.", 409), res);
+      }
+      return handleDbError(err, res);
+    });
 };
 
 // GET /users
