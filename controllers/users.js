@@ -18,6 +18,16 @@ const {
 const login = (req, res) => {
   const { email, password } = req.body;
 
+  if (!email || !password) {
+    return res
+      .status(BAD_REQUEST)
+      .send({ message: "Email and password are required." });
+  }
+
+  if (!validator.isEmail(email)) {
+    return res.status(BAD_REQUEST).send({ message: "Invalid email format." });
+  }
+
   User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
@@ -26,9 +36,9 @@ const login = (req, res) => {
 
       res.send({ token });
     })
-    .catch(() => {
-      throwError(UNAUTHORIZED_MSG, UNAUTHORIZED_ERROR);
-    });
+    .catch(() =>
+      res.status(UNAUTHORIZED_ERROR).send({ message: UNAUTHORIZED_MSG })
+    );
 };
 
 // POST /users

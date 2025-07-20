@@ -10,6 +10,9 @@ const {
   dislikeItem,
 } = require("../controllers/clothingItems");
 
+// Use auth middleware
+router.use(auth);
+
 // Get all clothing items
 router.get("/", getItems);
 

@@ -12,8 +12,8 @@ router.post("/signin", login);
 router.post("/signup", createUser);
 
 // Protected routes (auth middleware)
-router.use("/items", clothingItemsRouter);
-router.use("/users", userRouter);
+router.use("/items", auth, clothingItemsRouter);
+router.use("/users", auth, userRouter);
 
 // Fallback route for undefined endpoints
 router.use((req, res) => {
