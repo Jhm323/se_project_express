@@ -16,7 +16,7 @@ const createItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
 
   return ClothingItem.create({ name, weather, imageUrl, owner })
-    .then((item) => res.status(SUCCESS).send({ data: item }))
+    .then((item) => res.status(201).send({ data: item }))
     .catch((err) => handleDbError(err, res));
 };
 

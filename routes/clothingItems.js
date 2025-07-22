@@ -11,11 +11,11 @@ const {
   dislikeItem,
 } = require("../controllers/clothingItems");
 
-// Use auth middleware
-router.use(auth);
-
 // Get all clothing items
 router.get("/", getItems);
+
+// Use auth middleware
+router.use(auth);
 
 // Create a new clothing item
 router.post("/", createItem);
