@@ -1,5 +1,6 @@
 // Error Codes
 const SUCCESS = 200;
+const CREATED = 201;
 const BAD_REQUEST_ERROR = 400;
 const UNAUTHORIZED_ERROR = 401;
 const FORBIDDEN_ERROR = 403;
@@ -10,6 +11,7 @@ const DUPLICATE_ERROR = 11000;
 
 // Status Code Messages
 const SUCCESS_MSG = "Request completed successfully.";
+const CREATED_MSG = "Resource created successfully.";
 const BAD_REQUEST_MSG = "Bad request. Please check your input.";
 const UNAUTHORIZED_MSG = "Unauthorized. Authentication required.";
 const FORBIDDEN_MSG =
@@ -45,6 +47,8 @@ const throwError = (message, statusCode) => {
 module.exports = {
   SUCCESS,
   SUCCESS_MSG,
+  CREATED,
+  CREATED_MSG,
   BAD_REQUEST_ERROR,
   BAD_REQUEST_MSG,
   UNAUTHORIZED_ERROR,

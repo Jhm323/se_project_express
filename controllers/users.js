@@ -5,6 +5,7 @@ const User = require("../models/user");
 const { JWT_SECRET } = require("../utils/config");
 const {
   SUCCESS,
+  CREATED,
   BAD_REQUEST_ERROR,
   BAD_REQUEST_MSG,
   UNAUTHORIZED_ERROR,
@@ -74,7 +75,7 @@ const createUser = (req, res) => {
       })
     )
     .then((user) =>
-      res.status(201).send({
+      res.status(CREATED).send({
         _id: user._id,
         email: user.email,
         name: user.name,

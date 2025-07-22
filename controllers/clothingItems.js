@@ -2,6 +2,7 @@ const ClothingItem = require("../models/clothingItem");
 const {
   SUCCESS,
   SUCCESS_MSG,
+  CREATED,
   FORBIDDEN_ERROR,
   FORBIDDEN_MSG,
   NOT_FOUND_ERROR,
@@ -16,7 +17,7 @@ const createItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
 
   return ClothingItem.create({ name, weather, imageUrl, owner })
-    .then((item) => res.status(201).send({ data: item }))
+    .then((item) => res.status(CREATED).send({ data: item }))
     .catch((err) => handleDbError(err, res));
 };
 
