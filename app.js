@@ -3,6 +3,8 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const { rateLimit } = require("express-rate-limit");
 const helmet = require("helmet");
+const { errors } = require("celebrate");
+const { requestLogger, errorLogger } = require("./middlewares/logger");
 const mainRouter = require("./routes/index");
 
 const app = express();
@@ -29,8 +31,18 @@ app.use(cors());
 app.use(limiter);
 app.use(helmet());
 
+// celebrate error handler
+app.use(errors());
+
 // Application routes
+app.use(requestLogger);
 app.use(mainRouter);
+
+// Error Logger
+app.use(errorLogger); // enabling the error logger
+
+app.use(errors()); // celebrate error handler
+app.use(errorHandler); //centralized error handler
 
 // Disable X-Powered-By header for security (best practice)
 app.disable("x-powered-by");

@@ -8,9 +8,14 @@ const userRouter = require("./users");
 const { login, createUser } = require("../controllers/users");
 const { NOT_FOUND_ERROR } = require("../utils/errors");
 
+const {
+  validateLoginBody,
+  validateUserBody,
+} = require("../middlewares/validation");
+
 // Auth (public) routes
-router.post("/signin", login);
-router.post("/signup", createUser);
+router.post("/signin", validateLoginBody, login);
+router.post("/signup", validateUserBody, createUser);
 
 // Protected routes (auth middleware)
 router.use("/items", clothingItemsRouter);
