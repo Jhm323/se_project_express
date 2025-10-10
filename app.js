@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -31,18 +33,18 @@ app.use(cors());
 app.use(limiter);
 app.use(helmet());
 
-// celebrate error handler
-app.use(errors());
-
-// Application routes
+// Request Logger
 app.use(requestLogger);
+
+// App Routes
+
 app.use(mainRouter);
 
 // Error Logger
-app.use(errorLogger); // enabling the error logger
+app.use(errorLogger);
 
-app.use(errors()); // celebrate error handler
-app.use(errorHandler); //centralized error handler
+// Celebrate error handler
+app.use(errors());
 
 // Disable X-Powered-By header for security (best practice)
 app.disable("x-powered-by");
@@ -52,9 +54,7 @@ app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
 
-// Global error handler — catches errors from routes & middleware
-
-// eslint-disable-next-line no-unused-vars
+// Centralized error handler
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
   const message = statusCode === 500 ? "Internal Server Error" : err.message;
