@@ -2,6 +2,16 @@
 
 This repository contains the backend server for the "WTWR" (What to Wear?) application. Built with **Express.js**, **MongoDB**, and **Mongoose**, it provides a RESTful API with user authentication, secure route access, and CRUD functionality for user profiles and clothing items.
 
+## Project Info
+
+The project’s domain name: seapp.crabdance.com.
+A link to the frontend GitHub repo:https://github.com/Jhm323/se_project_react.
+
+## Project Pitch Video
+
+Check out [this video](ADD_LINK_HERE), where I describe my
+project and some challenges I faced while building it.
+
 ## Project Setup
 
 To get started:
