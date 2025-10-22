@@ -10,7 +10,7 @@ const validateURL = (value, helpers) => {
   return helpers.error("string.uri");
 };
 
-// Validate Clothing Item Params
+// Validate Clothing Item Params & Weather
 
 module.exports.validateCardBody = celebrate({
   body: Joi.object().keys({
@@ -22,6 +22,10 @@ module.exports.validateCardBody = celebrate({
     imageUrl: Joi.string().required().custom(validateURL).messages({
       "string.empty": 'The "imageUrl" field must be filled in',
       "string.uri": 'The "imageUrl" field must be a valid URL',
+    }),
+    weather: Joi.string().valid("hot", "warm", "cold").required().messages({
+      "any.only": 'The "weather" field must be one of "hot", "warm", or "cold"',
+      "string.empty": 'The "weather" field must be filled in',
     }),
   }),
 });
@@ -66,10 +70,10 @@ module.exports.validateLoginBody = celebrate({
 
 module.exports.validateId = celebrate({
   params: Joi.object().keys({
-    id: Joi.string().required().length(24).hex().messages({
-      "string.hex": 'The "id" field must be a valid hexadecimal string',
-      "string.length": 'The "id" field must be 24 characters long',
-      "string.empty": 'The "id" field must be filled in',
+    itemId: Joi.string().required().length(24).hex().messages({
+      "string.hex": 'The "itemId" field must be a valid hexadecimal string',
+      "string.length": 'The "itemId" field must be 24 characters long',
+      "string.empty": 'The "itemId" field must be filled in',
     }),
   }),
 });
