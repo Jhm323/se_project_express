@@ -3,72 +3,70 @@ const {
   SUCCESS,
   SUCCESS_MSG,
   CREATED,
-  FORBIDDEN_ERROR,
-  FORBIDDEN_MSG,
-  NOT_FOUND_ERROR,
   NOT_FOUND_MSG,
-  handleDbError,
-  throwError,
+  NotFoundError,
+  FORBIDDEN_MSG,
+  ForbiddenError,
 } = require("../utils/errors");
 
 // CREATE ITEM
-const createItem = (req, res) => {
+const createItem = (req, res, next) => {
   const owner = req.user._id;
   const { name, weather, imageUrl } = req.body;
 
   return ClothingItem.create({ name, weather, imageUrl, owner })
     .then((item) => res.status(CREATED).send({ data: item }))
-    .catch((err) => handleDbError(err, res));
+    .catch((err) => next(err));
 };
 
 // GET ALL ITEMS
-const getItems = (req, res) =>
+const getItems = (req, res, next) =>
   ClothingItem.find({})
     .then((items) => res.status(SUCCESS).send(items))
-    .catch((err) => handleDbError(err, res));
+    .catch((err) => next(err));
 
 // DELETE ITEM
-const deleteItem = (req, res) => {
+const deleteItem = (req, res, next) => {
   const { itemId } = req.params;
   const currentUserId = req.user._id;
 
-  return ClothingItem.findById(itemId)
+  ClothingItem.findById(itemId)
     .then((item) => {
       if (!item) {
-        throw throwError(NOT_FOUND_MSG, NOT_FOUND_ERROR);
+        throw new NotFoundError(NOT_FOUND_MSG);
       }
 
       if (item.owner.toString() !== currentUserId.toString()) {
-        throw throwError(FORBIDDEN_MSG, FORBIDDEN_ERROR);
+        throw new ForbiddenError(FORBIDDEN_MSG);
       }
 
       return ClothingItem.findByIdAndDelete(itemId);
     })
     .then(() => res.status(SUCCESS).send({ message: SUCCESS_MSG }))
-    .catch((err) => handleDbError(err, res));
+    .catch((err) => next(err));
 };
 
 // LIKE ITEM
-const likeItem = (req, res) =>
+const likeItem = (req, res, next) =>
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
     { $addToSet: { likes: req.user._id } }, // prevents duplicate likes
     { new: true }
   )
-    .orFail(() => throwError(NOT_FOUND_MSG, NOT_FOUND_ERROR))
+    .orFail(() => new NotFoundError(NOT_FOUND_MSG))
     .then((item) => res.status(SUCCESS).send({ data: item }))
-    .catch((err) => handleDbError(err, res));
+    .catch((err) => next(err));
 
 // DISLIKE ITEM
-const dislikeItem = (req, res) =>
+const dislikeItem = (req, res, next) =>
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
     { $pull: { likes: req.user._id } },
     { new: true }
   )
-    .orFail(() => throwError(NOT_FOUND_MSG, NOT_FOUND_ERROR))
+    .orFail(() => new NotFoundError(NOT_FOUND_MSG))
     .then((item) => res.status(SUCCESS).send({ data: item }))
-    .catch((err) => handleDbError(err, res));
+    .catch((err) => next(err));
 
 module.exports = {
   createItem,

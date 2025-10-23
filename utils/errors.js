@@ -22,21 +22,51 @@ const INTERNAL_SERVER_ERROR_MSG =
   "Internal server error. Please try again later.";
 const DUPLICATE_ERROR_MSG = "Duplicate key error. This item already exists.";
 
-// Database error handler
-const handleDbError = (err, res) => {
-  if (err.name === "ValidationError" || err.name === "CastError") {
-    return res.status(BAD_REQUEST_ERROR).send({ message: BAD_REQUEST_MSG });
+// custom Errors
+
+class BadRequestError extends Error {
+  constructor(message = "Bad request. Please check your input.") {
+    super(message);
+    this.statusCode = 400;
   }
-  if (err.statusCode === NOT_FOUND_ERROR) {
-    return res.status(NOT_FOUND_ERROR).send({ message: NOT_FOUND_MSG });
+}
+
+class UnauthorizedError extends Error {
+  constructor(message = "Unauthorized. Authentication required.") {
+    super(message);
+    this.statusCode = 401;
   }
-  if (err.statusCode === FORBIDDEN_ERROR) {
-    return res.status(FORBIDDEN_ERROR).send({ message: FORBIDDEN_MSG });
+}
+
+class ForbiddenError extends Error {
+  constructor(
+    message = "Forbidden. You do not have permission to perform this action."
+  ) {
+    super(message);
+    this.statusCode = 403;
   }
-  return res
-    .status(INTERNAL_SERVER_ERROR)
-    .send({ message: INTERNAL_SERVER_ERROR_MSG });
-};
+}
+
+class NotFoundError extends Error {
+  constructor(message = "Resource not found.") {
+    super(message);
+    this.statusCode = 404;
+  }
+}
+
+class ConflictError extends Error {
+  constructor(message = "Conflict. The resource already exists.") {
+    super(message);
+    this.statusCode = 409;
+  }
+}
+
+class InternalServerError extends Error {
+  constructor(message = "Internal server error. Please try again later.") {
+    super(message);
+    this.statusCode = 500;
+  }
+}
 
 const throwError = (message, statusCode) => {
   const err = new Error(message);
@@ -63,6 +93,11 @@ module.exports = {
   INTERNAL_SERVER_ERROR_MSG,
   DUPLICATE_ERROR,
   DUPLICATE_ERROR_MSG,
-  handleDbError,
   throwError,
+  BadRequestError,
+  UnauthorizedError,
+  ForbiddenError,
+  NotFoundError,
+  ConflictError,
+  InternalServerError,
 };
