@@ -56,11 +56,6 @@ app.use(errors());
 // Disable X-Powered-By header for security (best practice)
 app.disable("x-powered-by");
 
-// 404 handler — catch-all for unknown routes
-app.use((req, res) => {
-  res.status(404).json({ message: "Route not found" });
-});
-
 // Centralized error handler
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
@@ -71,6 +66,7 @@ app.use((err, req, res, next) => {
   }
 
   res.status(statusCode).json({ message });
+  next();
 });
 
 // Start server
