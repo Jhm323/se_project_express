@@ -16,19 +16,25 @@ const {
   throwError,
 } = require("../utils/errors");
 
+const {
+  BadRequestError,
+  ConflictError,
+  UnauthorizedError,
+} = require("../errors/CustomErrors");
+
 // POST /signin
 const login = (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return handleDbError(
+    return BadRequestError(
       throwError("Email and password are required.", BAD_REQUEST_ERROR),
       res
     );
   }
 
   if (!validator.isEmail(email)) {
-    return handleDbError(
+    return BadRequestError(
       throwError("Invalid email format.", BAD_REQUEST_ERROR),
       res
     );
@@ -42,7 +48,7 @@ const login = (req, res) => {
       return res.send({ token });
     })
     .catch(() =>
-      handleDbError(throwError(UNAUTHORIZED_MSG, UNAUTHORIZED_ERROR), res)
+      UnauthorizedError(throwError(UNAUTHORIZED_MSG, UNAUTHORIZED_ERROR), res)
     );
 };
 
@@ -51,14 +57,14 @@ const createUser = (req, res) => {
   const { email, password, name, avatar } = req.body;
 
   if (!email || !password) {
-    return handleDbError(
+    return BadRequestError(
       throwError("Email and password are required.", BAD_REQUEST_ERROR),
       res
     );
   }
 
   if (!validator.isEmail(email)) {
-    return handleDbError(
+    return BadRequestError(
       throwError("Invalid email format.", BAD_REQUEST_ERROR),
       res
     );
@@ -85,9 +91,9 @@ const createUser = (req, res) => {
 
     .catch((err) => {
       if (err.code === 11000) {
-        return handleDbError(throwError("Email already exists.", 409), res);
+        return ConflictError(throwError("Email already exists.", 409), res);
       }
-      return handleDbError(err, res);
+      return BadRequestError(err, res);
     });
 };
 
@@ -95,7 +101,7 @@ const createUser = (req, res) => {
 const getUsers = (req, res) =>
   User.find({})
     .then((users) => res.status(SUCCESS).send(users))
-    .catch((err) => handleDbError(err, res));
+    .catch((err) => BadRequestError(err, res));
 
 // GET /users/me
 const getCurrentUser = (req, res) => {
@@ -104,7 +110,7 @@ const getCurrentUser = (req, res) => {
   return User.findById(userId)
     .orFail(() => throwError(NOT_FOUND_MSG, NOT_FOUND_ERROR))
     .then((user) => res.status(SUCCESS).send(user))
-    .catch((err) => handleDbError(err, res));
+    .catch((err) => BadRequestError(err, res));
 };
 
 // PATCH /users/me
@@ -112,7 +118,7 @@ const updateProfile = (req, res) => {
   const { name, avatar } = req.body;
 
   if (!name && !avatar) {
-    return handleDbError(throwError(BAD_REQUEST_MSG, BAD_REQUEST_ERROR), res);
+    return BadRequestError(throwError(BAD_REQUEST_MSG, BAD_REQUEST_ERROR), res);
   }
 
   return User.findByIdAndUpdate(
@@ -122,7 +128,7 @@ const updateProfile = (req, res) => {
   )
     .orFail(() => throwError(NOT_FOUND_MSG, NOT_FOUND_ERROR))
     .then((user) => res.send(user))
-    .catch((err) => handleDbError(err, res));
+    .catch((err) => BadRequestError(err, res));
 };
 
 module.exports = { getUsers, createUser, getCurrentUser, login, updateProfile };

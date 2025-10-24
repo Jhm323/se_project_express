@@ -6,6 +6,7 @@ const cors = require("cors");
 const { rateLimit } = require("express-rate-limit");
 const helmet = require("helmet");
 const { errors } = require("celebrate");
+const errorHandler = require("./error");
 const { requestLogger, errorLogger } = require("./middlewares/logger");
 const mainRouter = require("./routes/index");
 
@@ -57,17 +58,7 @@ app.use(errors());
 app.disable("x-powered-by");
 
 // Global error handler
-app.use((err, req, res, next) => {
-  const statusCode = err.statusCode || 500;
-  const message = statusCode === 500 ? "Internal Server Error" : err.message;
-
-  if (process.env.NODE_ENV !== "production") {
-    console.error(err.stack);
-  }
-
-  res.status(statusCode).json({ message });
-  next();
-});
+app.use(errorHandler);
 
 // Start server
 app.listen(PORT, () => {

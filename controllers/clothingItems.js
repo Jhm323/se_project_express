@@ -4,12 +4,13 @@ const {
   SUCCESS_MSG,
   CREATED,
   NOT_FOUND_MSG,
-  NotFoundError,
   FORBIDDEN_MSG,
-  ForbiddenError,
 } = require("../utils/errors");
 
+const { ForbiddenError, NotFoundError } = require("../errors/CustomErrors");
+
 // CREATE ITEM
+
 const createItem = (req, res, next) => {
   const owner = req.user._id;
   const { name, weather, imageUrl } = req.body;
