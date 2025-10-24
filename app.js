@@ -37,7 +37,7 @@ app.use(helmet());
 app.use(requestLogger);
 
 // Server crash testing
-app.get("/crash-test", () => {
+app.get("/crash-test", (req, res) => {
   setTimeout(() => {
     throw new Error("Server will crash now");
   }, 0);
@@ -45,7 +45,7 @@ app.get("/crash-test", () => {
 
 // App Routes
 
-app.use(mainRouter);
+app.use("/", mainRouter);
 
 // Error Logger
 app.use(errorLogger);
@@ -56,7 +56,7 @@ app.use(errors());
 // Disable X-Powered-By header for security (best practice)
 app.disable("x-powered-by");
 
-// Centralized error handler
+// Global error handler
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
   const message = statusCode === 500 ? "Internal Server Error" : err.message;
