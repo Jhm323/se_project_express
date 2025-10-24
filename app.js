@@ -37,7 +37,19 @@ app.use(helmet());
 // Request Logger
 app.use(requestLogger);
 
-// Server crash testing
+// Handle uncaught exceptions so PM2 can restart
+process.on("uncaughtException", (err) => {
+  console.error("Uncaught Exception:", err);
+  process.exit(1); // Exit so PM2 restarts the process
+});
+
+// Handle unhandled promise rejections
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("Unhandled Rejection at:", promise, "reason:", reason);
+  process.exit(1); // Exit so PM2 restarts the process
+});
+
+// Server crash testing route
 app.get("/crash-test", (req, res) => {
   setTimeout(() => {
     throw new Error("Server will crash now");
