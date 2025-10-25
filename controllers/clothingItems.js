@@ -7,7 +7,9 @@ const {
   FORBIDDEN_MSG,
 } = require("../utils/errors");
 
-const { ForbiddenError, NotFoundError } = require("../errors/CustomErrors");
+const { ForbiddenError } = require("../errors/ForbiddenError");
+const { NotFoundError } = require("../errors/NotFoundError");
+const { BadRequestError } = require("../errors/BadRequestError");
 
 // CREATE ITEM
 

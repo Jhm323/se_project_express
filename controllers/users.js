@@ -5,11 +5,10 @@ const User = require("../models/user");
 const { JWT_SECRET } = require("../utils/config");
 const { SUCCESS, CREATED, NOT_FOUND_MSG } = require("../utils/errors");
 
-const {
-  BadRequestError,
-  ConflictError,
-  UnauthorizedError,
-} = require("../errors/CustomErrors");
+const { BadRequestError } = require("../errors/BadRequestError");
+const { ConflictError } = require("../errors/ConflictError");
+const { UnauthorizedError } = require("../errors/UnauthorizedError");
+const { NotFoundError } = require("../errors/NotFoundError");
 
 // POST /signin
 const login = (req, res, next) => {
