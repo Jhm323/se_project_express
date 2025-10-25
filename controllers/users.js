@@ -3,18 +3,7 @@ const bcrypt = require("bcryptjs");
 const validator = require("validator");
 const User = require("../models/user");
 const { JWT_SECRET } = require("../utils/config");
-const {
-  SUCCESS,
-  CREATED,
-  BAD_REQUEST_ERROR,
-  BAD_REQUEST_MSG,
-  UNAUTHORIZED_ERROR,
-  UNAUTHORIZED_MSG,
-  NOT_FOUND_ERROR,
-  NOT_FOUND_MSG,
-  handleDbError,
-  throwError,
-} = require("../utils/errors");
+const { SUCCESS, CREATED, NOT_FOUND_MSG } = require("../utils/errors");
 
 const {
   BadRequestError,
