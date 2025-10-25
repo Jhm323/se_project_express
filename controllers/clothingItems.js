@@ -17,7 +17,13 @@ const createItem = (req, res, next) => {
 
   return ClothingItem.create({ name, weather, imageUrl, owner })
     .then((item) => res.status(CREATED).send({ data: item }))
-    .catch((err) => next(err));
+    .catch((err) => {
+      if (err.name === "ValidationError") {
+        next(new BadRequestError("Invalid data provided when creating item"));
+      } else {
+        next(err);
+      }
+    });
 };
 
 // GET ALL ITEMS
