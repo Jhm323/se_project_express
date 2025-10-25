@@ -23,21 +23,15 @@ const {
 } = require("../errors/CustomErrors");
 
 // POST /signin
-const login = (req, res) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return BadRequestError(
-      throwError("Email and password are required.", BAD_REQUEST_ERROR),
-      res
-    );
+    return next(new BadRequestError("Email and password are required."));
   }
 
   if (!validator.isEmail(email)) {
-    return BadRequestError(
-      throwError("Invalid email format.", BAD_REQUEST_ERROR),
-      res
-    );
+    return next(new BadRequestError("Invalid email format."));
   }
 
   return User.findUserByCredentials(email, password)
@@ -47,27 +41,19 @@ const login = (req, res) => {
       });
       return res.send({ token });
     })
-    .catch(() =>
-      UnauthorizedError(throwError(UNAUTHORIZED_MSG, UNAUTHORIZED_ERROR), res)
-    );
+    .catch(() => next(new UnauthorizedError("Invalid email or password.")));
 };
 
 // POST /users
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   const { email, password, name, avatar } = req.body;
 
   if (!email || !password) {
-    return BadRequestError(
-      throwError("Email and password are required.", BAD_REQUEST_ERROR),
-      res
-    );
+    return next(new BadRequestError("Email and password are required."));
   }
 
   if (!validator.isEmail(email)) {
-    return BadRequestError(
-      throwError("Invalid email format.", BAD_REQUEST_ERROR),
-      res
-    );
+    return next(new BadRequestError("Invalid email format."));
   }
 
   return bcrypt
@@ -91,34 +77,43 @@ const createUser = (req, res) => {
 
     .catch((err) => {
       if (err.code === 11000) {
-        return ConflictError(throwError("Email already exists.", 409), res);
+        return next(new ConflictError("Email already exists."));
       }
-      return BadRequestError(err, res);
+      if (err.name === "ValidationError") {
+        return next(
+          new BadRequestError("Invalid data provided when creating user.")
+        );
+      }
+      return next(err);
     });
 };
 
 // GET /users
-const getUsers = (req, res) =>
+const getUsers = (req, res, next) =>
   User.find({})
     .then((users) => res.status(SUCCESS).send(users))
-    .catch((err) => BadRequestError(err, res));
+    .catch((err) => next(err));
 
 // GET /users/me
-const getCurrentUser = (req, res) => {
+const getCurrentUser = (req, res, next) => {
   const userId = req.user._id;
 
   return User.findById(userId)
-    .orFail(() => throwError(NOT_FOUND_MSG, NOT_FOUND_ERROR))
+    .orFail(() => new NotFoundError(NOT_FOUND_MSG))
     .then((user) => res.status(SUCCESS).send(user))
-    .catch((err) => BadRequestError(err, res));
+    .catch((err) => next(err));
 };
 
 // PATCH /users/me
-const updateProfile = (req, res) => {
+const updateProfile = (req, res, next) => {
   const { name, avatar } = req.body;
 
   if (!name && !avatar) {
-    return BadRequestError(throwError(BAD_REQUEST_MSG, BAD_REQUEST_ERROR), res);
+    return next(
+      new BadRequestError(
+        "At least one field (name or avatar) must be provided."
+      )
+    );
   }
 
   return User.findByIdAndUpdate(
@@ -126,9 +121,16 @@ const updateProfile = (req, res) => {
     { name, avatar },
     { new: true, runValidators: true }
   )
-    .orFail(() => throwError(NOT_FOUND_MSG, NOT_FOUND_ERROR))
-    .then((user) => res.send(user))
-    .catch((err) => BadRequestError(err, res));
+    .orFail(() => new NotFoundError(NOT_FOUND_MSG))
+    .then((user) => res.status(SUCCESS).send(user))
+    .catch((err) => {
+      if (err.name === "ValidationError") {
+        return next(
+          new BadRequestError("Invalid data provided when updating profile.")
+        );
+      }
+      return next(err);
+    });
 };
 
 module.exports = { getUsers, createUser, getCurrentUser, login, updateProfile };
