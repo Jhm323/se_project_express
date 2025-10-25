@@ -20,9 +20,8 @@ const createItem = (req, res, next) => {
     .catch((err) => {
       if (err.name === "ValidationError") {
         next(new BadRequestError("Invalid data provided when creating item"));
-      } else {
-        next(err);
       }
+      return next(err);
     });
 };
 
@@ -50,30 +49,47 @@ const deleteItem = (req, res, next) => {
       return ClothingItem.findByIdAndDelete(itemId);
     })
     .then(() => res.status(SUCCESS).send({ message: SUCCESS_MSG }))
-    .catch((err) => next(err));
+    .catch((err) => {
+      if (err.name === "CastError") {
+        return next(new BadRequestError("Invalid item ID format."));
+      }
+      return next(err);
+    });
 };
 
 // LIKE ITEM
-const likeItem = (req, res, next) =>
+const likeItem = (req, res, next) => {
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
     { $addToSet: { likes: req.user._id } }, // prevents duplicate likes
-    { new: true }
+    { new: true, runValidators: true }
   )
     .orFail(() => new NotFoundError(NOT_FOUND_MSG))
     .then((item) => res.status(SUCCESS).send({ data: item }))
-    .catch((err) => next(err));
+    .catch((err) => {
+      if (err.name === "CastError") {
+        return next(new BadRequestError("Invalid item ID format."));
+      }
+      return next(err);
+    });
+};
 
 // DISLIKE ITEM
-const dislikeItem = (req, res, next) =>
+const dislikeItem = (req, res, next) => {
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
     { $pull: { likes: req.user._id } },
-    { new: true }
+    { new: true, runValidators: true }
   )
     .orFail(() => new NotFoundError(NOT_FOUND_MSG))
     .then((item) => res.status(SUCCESS).send({ data: item }))
-    .catch((err) => next(err));
+    .catch((err) => {
+      if (err.name === "CastError") {
+        return next(new BadRequestError("Invalid item ID format."));
+      }
+      return next(err);
+    });
+};
 
 module.exports = {
   createItem,
