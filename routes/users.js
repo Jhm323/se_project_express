@@ -1,6 +1,7 @@
 const express = require("express");
 
 const router = express.Router();
+const { validateUserUpdate } = require("../middlewares/validation");
 const { getCurrentUser, updateProfile } = require("../controllers/users");
 
 // Get authenticated user's info

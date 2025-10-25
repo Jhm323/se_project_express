@@ -1,16 +1,10 @@
-const express = require("express");
-const router = express.Router();
+const router = require("express").Router();
 
 const auth = require("../middlewares/auth");
 const clothingItemsRouter = require("./clothingItems");
 const userRouter = require("./users");
 const { login, createUser } = require("../controllers/users");
-const {
-  NOT_FOUND_ERROR,
-  NOT_FOUND_MSG,
-  throwError,
-} = require("../utils/errors");
-
+const { NotFoundError } = require("../errors/NotFoundError");
 const {
   validateLoginBody,
   validateUserBody,
@@ -25,8 +19,8 @@ router.use("/items", clothingItemsRouter);
 router.use("/users", auth, userRouter);
 
 // Fallback route for undefined endpoints
-router.use((req, res, next) => {
-  throwError(NOT_FOUND_MSG, NOT_FOUND_ERROR);
+router.use((_req, _res, next) => {
+  next(new NotFoundError("Route not found"));
 });
 
 module.exports = router;
