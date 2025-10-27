@@ -31,13 +31,13 @@ module.exports.validateCardBody = celebrate({
 });
 
 // Validation schema for updating user info
-const validateUserUpdate = celebrate({
+module.exports.validateUserUpdate = celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30).required(),
-    avatar: Joi.string()
-      .uri()
-      .pattern(/^https?:\/\/(www\.)?[\w\-._~:/?#[\]@!$&'()*+,;=]+#?$/)
-      .required(),
+    avatar: Joi.string().required().uri().messages({
+      "string.empty": 'The "avatar" field must be filled in',
+      "string.uri": 'The "avatar" field must be a valid URL',
+    }),
   }),
 });
 
@@ -88,5 +88,3 @@ module.exports.validateId = celebrate({
     }),
   }),
 });
-
-module.exports = { validateURL, validateUserUpdate };
