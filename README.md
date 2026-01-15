@@ -1,17 +1,159 @@
-# WTWR Backend Server - Project 13
+# WTWR Backend Server — Project 13
 
-This repository contains the backend server for the "WTWR" (What to Wear?) application. Built with **Express.js**, **MongoDB**, and **Mongoose**, it provides a RESTful API with user authentication, secure route access, and CRUD functionality for user profiles and clothing items.
+The **WTWR (What to Wear?) Backend Server** powers the API for a full-stack clothing recommendation application. Built with **Node.js**, **Express**, and **MongoDB**, this service handles authentication, authorization, and secure data management for users and clothing items.
 
-## Project Info
+The backend follows RESTful design principles and mirrors real-world production patterns such as JWT authentication, ownership-based access control, and centralized error handling.
 
-The project’s domain name: seapp.crabdance.com.
-A link to the frontend GitHub repo:https://github.com/Jhm323/se_project_react.
+---
 
-## Project Pitch Video
+## 🌐 Project Links
 
-Check out (https://www.loom.com/share/083ea935eb9749df89e1412ccb6ee0fd), where I describe my project and some challenges I faced while building it.
+- **Backend Repository:** https://github.com/Jhm323/se_project_express  
+- **Frontend Repository:** https://github.com/Jhm323/se_project_react  
+- **Deployed API Domain:** `https://seapp.crabdance.com`
 
-## Project Setup
+---
+
+## 🎯 Project Objective
+
+The primary goal of this project was to design and implement a **secure, production-ready backend API** that:
+
+- Authenticates users with email/password credentials
+- Protects sensitive routes using JWT-based authorization
+- Enforces ownership rules for user-generated content
+- Validates and sanitizes incoming data
+- Supports seamless integration with a React frontend
+
+This project emphasizes **security, scalability, and clean backend architecture**.
+
+---
+
+## 🧠 What Was Built & How It Works
+
+### Core Functionality
+
+#### **User Authentication**
+- Signup and login using JWT tokens
+- Password hashing with `bcryptjs`
+- Secure token verification middleware
+
+#### **Authorization & Route Protection**
+- Private routes require valid JWTs
+- Ownership checks prevent unauthorized deletions
+- Public access limited to read-only endpoints
+
+#### **Clothing Item Management**
+- Create, read, like, and delete clothing items
+- Ownership-based deletion enforcement
+- Weather-based item categorization
+
+#### **Data Validation & Security**
+- Email and URL validation using `validator`
+- Password field excluded from query results
+- Centralized error handling with consistent status codes
+
+#### **Developer Tooling**
+- ESLint + Prettier for code consistency
+- Nodemon for local development
+- GitHub Actions for automated testing
+
+---
+
+## 🖼 Architecture & API Flow (Visual Overview)
+
+> While this project is backend-focused, the following visuals illustrate how the API operates within the system.
+
+### Authentication Flow
+
+```
+┌───────────────┐     ┌───────────────────┐     ┌────────────────────┐
+│               │     │                   │     │                    │
+│   User signs  │     │  Server verifies   │     │  Server responds   │
+│   up / logs in│ ──> │  credentials &    │ ──> │  with JWT token    │
+│               │     │  issues token     │     │                    │
+└───────────────┘     └───────────────────┘     └────────────────────┘
+```
+
+### Protected Route Access
+
+```
+┌───────────────┐     ┌───────────────────┐     ┌────────────────────┐
+│               │     │                   │     │                    │
+│   User makes  │     │  Server checks    │     │  Requested data /  │
+│   authorized   │ ──> │  token validity   │ ──> │  action is served  │
+│   request      │     │  and user role   │     │  or error is sent  │
+│               │     │                   │     │                    │
+└───────────────┘     └───────────────────┘     └────────────────────┘
+```
+
+---
+
+## 📚 API Documentation
+
+### Authentication & Authorization
+
+**Signup** (`POST /signup`)  
+Creates a new user account.
+
+**Login** (`POST /signin`)  
+Returns a JWT if email and password are correct.
+
+All other routes are protected and require a valid JWT in the `Authorization` header, except:
+
+- `POST /signup`
+- `POST /signin`
+- `GET /items`
+
+Middleware in `middlewares/auth.js` checks token validity and attaches user info to the request.
+
+### User Endpoints
+
+- `GET /users/me` — Return the currently authenticated user
+- `PATCH /users/me` — Update the current user's `name` and `avatar`
+
+#### Signup Request Body
+
+```json
+{
+  "email": "user@example.com",
+  "password": "securepassword",
+  "name": "Your Name",
+  "avatar": "https://example.com/avatar.jpg"
+}
+```
+
+#### Login Request Body
+
+```json
+{
+  "email": "user@example.com",
+  "password": "securepassword"
+}
+```
+
+### Clothing Item Endpoints
+
+- `GET /items` — Return all clothing items (public)
+- `POST /items` — Add a new clothing item (authenticated)
+- `DELETE /items/:itemId` — Delete a clothing item (only if user is owner)
+- `PUT /items/:itemId/likes` — Like an item
+- `DELETE /items/:itemId/likes` — Unlike an item
+
+#### POST /items Request Body
+
+```json
+{
+  "name": "Jacket",
+  "weather": "cold",
+  "imageUrl": "https://example.com/jacket.jpg"
+}
+```
+
+Item ownership is enforced when deleting items. Users can only delete their own items.
+
+---
+
+## ⚙️ Development Setup
 
 To get started:
 
@@ -33,139 +175,7 @@ Install development tools:
 npm install --save-dev nodemon eslint@8 eslint-config-airbnb-base@15 eslint-plugin-import@2 eslint-config-prettier@8 prettier@2
 ```
 
-## Project Objective
-
-This backend server includes the following features:
-
-- User signup and login with JWT-based authentication
-- Password hashing and field protection
-- Secure routes using custom authorization middleware
-- Profile editing and resource ownership validation
-- RESTful routes for users and clothing items
-- Linting and formatting with ESLint and Prettier
-- GitHub Actions integration for continuous testing
-
-## Project Structure
-
-```
-.
-├── app.js              # Entry point
-├── controllers/        # Route logic
-├── middlewares/        # Authorization middleware
-├── models/             # Mongoose schemas
-├── routes/             # Express routers
-├── utils/              # Utilities (config, errors, etc.)
-├── .eslintrc.js        # Linter configuration
-├── .editorconfig       # Editor settings
-└── .github/            # GitHub Actions workflows
-```
-
-## Authentication & Authorization
-
-**Signup** (`POST /signup`)  
-Creates a new user account.
-
-**Login** (`POST /signin`)  
-Returns a JWT if email and password are correct.
-
-All other routes are protected and require a valid JWT in the `Authorization` header, except:
-
-- `POST /signup`
-- `POST /signin`
-- `GET /items`
-
-Middleware in `middlewares/auth.js` checks token validity and attaches user info to the request.
-
-## User Endpoints
-
-- `GET /users/me` — Return the currently authenticated user
-- `PATCH /users/me` — Update the current user's `name` and `avatar`
-
-### Signup Request Body
-
-```json
-{
-  "email": "user@example.com",
-  "password": "securepassword",
-  "name": "Your Name",
-  "avatar": "https://example.com/avatar.jpg"
-}
-```
-
-### Login Request Body
-
-```json
-{
-  "email": "user@example.com",
-  "password": "securepassword"
-}
-```
-
-## Clothing Item Endpoints
-
-- `GET /items` — Return all clothing items (public)
-- `POST /items` — Add a new clothing item (authenticated)
-- `DELETE /items/:itemId` — Delete a clothing item (only if user is owner)
-- `PUT /items/:itemId/likes` — Like an item
-- `DELETE /items/:itemId/likes` — Unlike an item
-
-### POST /items Request Body
-
-```json
-{
-  "name": "Jacket",
-  "weather": "cold",
-  "imageUrl": "https://example.com/jacket.jpg"
-}
-```
-
-Item ownership is enforced when deleting items. Users can only delete their own items.
-
-## Data Validation
-
-- Email and password fields are required during signup.
-- Passwords are hashed using `bcryptjs` and stored securely.
-- `validator` is used to check valid emails and URLs.
-- The password field is hidden from query results using `select: false`.
-
-To access the password for login authentication, use:
-
-```js
-User.findOne({ email }).select("+password");
-```
-
-## Error Handling
-
-Standardized error codes and messages are used throughout the app:
-
-| Code | Description                |
-| ---- | -------------------------- |
-| 400  | Bad Request / Invalid Data |
-| 401  | Unauthorized Access        |
-| 403  | Forbidden Action           |
-| 404  | Not Found                  |
-| 409  | Conflict / Duplicate       |
-| 500  | Internal Server Error      |
-
-Use `.orFail()` in Mongoose to catch missing resources and trigger appropriate error responses.
-
-## Linting & Formatting
-
-Use ESLint to check code style:
-
-```bash
-npm run lint
-```
-
-To automatically fix linting issues:
-
-```bash
-npm run lint -- --fix
-```
-
-Prettier is configured with Airbnb base style rules.
-
-## Development with Nodemon
+### Running the Development Server
 
 To run the development server with auto-reloading:
 
@@ -173,16 +183,9 @@ To run the development server with auto-reloading:
 npm run dev
 ```
 
-## CORS Setup
+---
 
-CORS is enabled to allow the frontend to communicate with this server:
-
-```js
-const cors = require("cors");
-app.use(cors());
-```
-
-## Testing
+## 🧪 Testing
 
 ### Postman
 
@@ -195,7 +198,9 @@ app.use(cors());
 - Push to GitHub to trigger tests
 - Review test results under the **Actions** tab
 
-## Submission Checklist
+---
+
+## ✅ Submission Checklist
 
 - [x] User authentication works using email and password
 - [x] JWT tokens are generated and verified correctly
@@ -207,19 +212,9 @@ app.use(cors());
 - [x] Postman tests pass
 - [x] GitHub Actions tests pass
 
-## Scripts
+---
 
-In your `package.json`, these scripts should be defined:
-
-```json
-"scripts": {
-  "start": "node app.js",
-  "dev": "nodemon app.js",
-  "lint": "npx eslint ."
-}
-```
-
-## Notes
+## 📜 Notes
 
 - Weather values should use one of the following enums: `"hot"`, `"warm"`, `"cold"`
 - Drop MongoDB collections in Compass if you need to enforce unique fields after development
