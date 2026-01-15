@@ -1,5 +1,12 @@
 # WTWR Backend Server — Project 13
 
+
+![ESLint](https://img.shields.io/badge/ESLint-Passing-brightgreen? logo=eslint)
+![Node.js](https://img.shields.io/badge/Node.js-v18+-339933?logo=nodedotjs&logoColor=white)
+![Express](https://img.shields.io/badge/Express-4.21-000000?logo=express&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-8.9-47A248?logo=mongodb&logoColor=white)
+
+
 The **WTWR (What to Wear?) Backend Server** powers the API for a full-stack clothing recommendation application. Built with **Node.js**, **Express**, and **MongoDB**, this service handles authentication, authorization, and secure data management for users and clothing items.
 
 The backend follows RESTful design principles and mirrors real-world production patterns such as JWT authentication, ownership-based access control, and centralized error handling.
