@@ -1,10 +1,9 @@
 # WTWR Backend Server — Project 13
 
-![ESLint](https://img.shields.io/badge/ESLint-passing-brightgreen?logo=eslint)
+![ESLint](https://img.shields.io/badge/ESLint-Passing-brightgreen? logo=eslint)
 ![Node.js](https://img.shields.io/badge/Node.js-v18+-339933?logo=nodedotjs&logoColor=white)
 ![Express](https://img.shields.io/badge/Express-4.21-000000?logo=express&logoColor=white)
 ![MongoDB](https://img.shields.io/badge/MongoDB-8.9-47A248?logo=mongodb&logoColor=white)
-
 
 The **WTWR (What to Wear?) Backend Server** powers the API for a full-stack clothing recommendation application. Built with **Node.js**, **Express**, and **MongoDB**, this service handles authentication, authorization, and secure data management for users and clothing items.
 
@@ -14,8 +13,8 @@ The backend follows RESTful design principles and mirrors real-world production 
 
 ## 🌐 Project Links
 
-- **Backend Repository:** https://github.com/Jhm323/se_project_express  
-- **Frontend Repository:** https://github.com/Jhm323/se_project_react  
+- **Backend Repository:** https://github.com/Jhm323/se_project_express
+- **Frontend Repository:** https://github.com/Jhm323/se_project_react
 - **Deployed API Domain:** `https://seapp.crabdance.com`
 
 ---
@@ -39,26 +38,31 @@ This project emphasizes **security, scalability, and clean backend architecture*
 ### Core Functionality
 
 #### **User Authentication**
+
 - Signup and login using JWT tokens
 - Password hashing with `bcryptjs`
 - Secure token verification middleware
 
 #### **Authorization & Route Protection**
+
 - Private routes require valid JWTs
 - Ownership checks prevent unauthorized deletions
 - Public access limited to read-only endpoints
 
 #### **Clothing Item Management**
+
 - Create, read, like, and delete clothing items
 - Ownership-based deletion enforcement
 - Weather-based item categorization
 
 #### **Data Validation & Security**
+
 - Email and URL validation using `validator`
 - Password field excluded from query results
 - Centralized error handling with consistent status codes
 
 #### **Developer Tooling**
+
 - ESLint + Prettier for code consistency
 - Nodemon for local development
 - GitHub Actions for automated testing
