@@ -23,8 +23,9 @@ const limiter = rateLimit({
 });
 
 // Connect to MongoDB
+const { MONGODB_URI = "mongodb://127.0.0.1:27017/wtwr_db" } = process.env;
 mongoose
-  .connect("mongodb://127.0.0.1:27017/wtwr_db")
+  .connect(MONGODB_URI)
   .then(() => console.log("Connected to DB"))
   .catch((e) => console.log("DB error", e));
 
