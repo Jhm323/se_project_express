@@ -1,6 +1,6 @@
 # WTWR Backend Server — Project 13
 
-![ESLint](https://img.shields.io/badge/ESLint-Passing-brightgreen? logo=eslint)
+![ESLint](https://img.shields.io/badge/ESLint-Passing-brightgreen?logo=eslint)
 ![Node.js](https://img.shields.io/badge/Node.js-v18+-339933?logo=nodedotjs&logoColor=white)
 ![Express](https://img.shields.io/badge/Express-4.21-000000?logo=express&logoColor=white)
 ![MongoDB](https://img.shields.io/badge/MongoDB-8.9-47A248?logo=mongodb&logoColor=white)
