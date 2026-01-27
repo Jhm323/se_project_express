@@ -15,7 +15,7 @@ The backend follows RESTful design principles and mirrors real-world production 
 
 - **Backend Repository:** https://github.com/Jhm323/se_project_express
 - **Frontend Repository:** https://github.com/Jhm323/se_project_react
-- **Deployed API Domain:** `https://seapp.crabdance.com`
+- **Site Demo:** https://wtwr-frontend-5mwu.onrender.com
 
 ---
 
