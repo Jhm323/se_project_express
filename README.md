@@ -1,6 +1,6 @@
 # WTWR Backend Server — Project 13
 
-![ESLint](https://img.shields.io/badge/ESLint-Passing-brightgreen? logo=eslint)
+![ESLint](https://img.shields.io/badge/ESLint-Passing-brightgreen?logo=eslint)
 ![Node.js](https://img.shields.io/badge/Node.js-v18+-339933?logo=nodedotjs&logoColor=white)
 ![Express](https://img.shields.io/badge/Express-4.21-000000?logo=express&logoColor=white)
 ![MongoDB](https://img.shields.io/badge/MongoDB-8.9-47A248?logo=mongodb&logoColor=white)
@@ -15,7 +15,7 @@ The backend follows RESTful design principles and mirrors real-world production 
 
 - **Backend Repository:** https://github.com/Jhm323/se_project_express
 - **Frontend Repository:** https://github.com/Jhm323/se_project_react
-- **Deployed API Domain:** `https://seapp.crabdance.com`
+- **Site Demo:** https://wtwr-frontend-5mwu.onrender.com
 
 ---
 
