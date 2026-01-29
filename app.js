@@ -11,7 +11,7 @@ const { requestLogger, errorLogger } = require("./middlewares/logger");
 const mainRouter = require("./routes/index");
 
 const app = express();
-const { PORT = 3001 } = process.env;
+const { PORT = 3002 } = process.env;
 
 // Rate limiter setup
 const limiter = rateLimit({
