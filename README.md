@@ -69,7 +69,7 @@ This project emphasizes **security, scalability, and clean backend architecture*
 
 ---
 
-## 🖼 Architecture & API Flow (Visual Overview)
+## 🖼 Architecture & API Flow
 
 > While this project is backend-focused, the following visuals illustrate how the API operates within the system.
 
@@ -78,7 +78,7 @@ This project emphasizes **security, scalability, and clean backend architecture*
 ```
 ┌───────────────┐     ┌───────────────────┐     ┌────────────────────┐
 │               │     │                   │     │                    │
-│   User signs  │     │  Server verifies   │     │  Server responds   │
+│   User signs  │     │  Server verifies  │     │  Server responds   │
 │   up / logs in│ ──> │  credentials &    │ ──> │  with JWT token    │
 │               │     │  issues token     │     │                    │
 └───────────────┘     └───────────────────┘     └────────────────────┘
@@ -90,8 +90,8 @@ This project emphasizes **security, scalability, and clean backend architecture*
 ┌───────────────┐     ┌───────────────────┐     ┌────────────────────┐
 │               │     │                   │     │                    │
 │   User makes  │     │  Server checks    │     │  Requested data /  │
-│   authorized   │ ──> │  token validity   │ ──> │  action is served  │
-│   request      │     │  and user role   │     │  or error is sent  │
+│   authorized  │ ──> │  token validity   │ ──> │  action is served  │
+│   request     │     │  and user role    │     │  or error is sent  │
 │               │     │                   │     │                    │
 └───────────────┘     └───────────────────┘     └────────────────────┘
 ```
